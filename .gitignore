@@ -15,3 +15,9 @@ CCAR-F-exam-guide-official.pdf
 
 # 個人情報・先方の会社情報。GitHub には上げない
 PRIVATE.md
+
+# 環境変数・シークレット（API キー等）
+.env
+.env.*
+.envrc
+!.env.example
