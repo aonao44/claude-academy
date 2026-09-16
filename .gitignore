@@ -12,3 +12,6 @@ __pycache__/
 CCAR-F.pdf
 guide_ja.pdf
 CCAR-F-exam-guide-official.pdf
+
+# 個人情報・先方の会社情報。GitHub には上げない
+PRIVATE.md
