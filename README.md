@@ -92,13 +92,18 @@ Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社�
 - 入社予定先 は公開顧客事例（（事例あり））を既に満たしており、
   **残っているのは認定者10人**。自分はその枠の1人
 
-## 手元の資産（正体を確認済み）
+## 手元の資産（PDF はリポジトリに含まない）
 
-| ファイル | 正体 |
-|---|---|
-| `CCAR-F.pdf` | **Matthew Purcell 氏の予想問題集 60問**（"Written following Exam Guide v1.0 (July 2026)"）。**公式ではない** |
-| `guide_ja.pdf` | **paullarionov 氏の非公式日本語学習ガイド 92ページ**。**公式ではない**（公式は英語のみなので多言語版は存在しない） |
-| （欠けているもの） | **公式 Exam Guide** ← Skilljar の「Download the exam guide」から取る。`学習プラン.md` STEP 0 |
+**この3点は第三者の著作物なので、リポジトリには入れていない**（`.gitignore` 済み）。
+各自で下記から取得し、リポジトリ直下にこのファイル名で置くと、本文中の参照が繋がる。
+
+| ファイル名 | 正体 | 入手先 |
+|---|---|---|
+| `CCAR-F-exam-guide-official.pdf` | **公式 Exam Guide v1.0（39ページ）。範囲を定義している唯一の一次資料** | [認定ページ](https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification) の「Download the exam guide」（ログイン不要） |
+| `guide_ja.pdf` | paullarionov 氏の非公式日本語学習ガイド 92ページ。**配点は公式と完全一致**し、構成も公式ブループリント準拠。**公式ではない** | [paullarionov/claude-certified-architect](https://github.com/paullarionov/claude-certified-architect) の `pdf/guide_ja.pdf` |
+| `CCAR-F.pdf` | Matthew Purcell 氏の予想問題集 60問（"Written following Exam Guide v1.0 (July 2026)"）。**公式ではない** | 著者の配布元から各自取得 |
+
+**公式は英語のみ。** 日本語試験は未提供で、多言語版の公式資料は存在しない。
 
 ## OpenAI 側（参考・当面動かせない）
 

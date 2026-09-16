@@ -7,3 +7,8 @@ __pycache__/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# 再配布不可の第三者資料。入手先は README 参照
+CCAR-F.pdf
+guide_ja.pdf
+CCAR-F-exam-guide-official.pdf
