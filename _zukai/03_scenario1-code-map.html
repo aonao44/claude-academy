@@ -1,0 +1,381 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シナリオ1のコード地図</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --val:#6b6760;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a;
+    --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --val:#a9a4b3;
+    --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a;
+  --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --val:#a9a4b3;
+  --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-block:24px;padding-inline:16px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px;margin-bottom:22px}
+h1{font-size:clamp(20px,3.4vw,28px);margin:0 0 6px}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:44px 0 6px;padding-top:14px;border-top:1px solid var(--line)}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+.claim{margin:0 0 14px;font-size:14px;color:var(--muted)}
+p,li{font-size:15px;max-width:72ch}
+figure{margin:0 0 8px;padding:10px 8px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.scroll{overflow-x:auto}
+svg.diagram{display:block;width:100%;min-width:760px;height:auto}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:8px;padding:0 4px}
+code{background:var(--code-bg);padding:.1em .38em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+
+/* ── 色分けの核 ── */
+.a{color:var(--theirs);font-weight:650}                       /* Anthropic 仕様で固定 */
+.js{color:var(--theirs);text-decoration:underline dotted;text-underline-offset:3px} /* JSON Schema の語 */
+.m{color:var(--mine);font-weight:650}                         /* 自分で決めた名前 */
+.v{color:var(--val);font-style:italic}                        /* 実行時に決まる値 */
+.c{color:var(--muted);font-style:italic}                      /* コメント */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;background:var(--card)}
+.chip .sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0}
+
+/* ── 注釈つきコード ── */
+.code{background:var(--code-bg);border-radius:10px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65;padding:10px 0}
+.ln{display:grid;grid-template-columns:3.2em 2.4em max-content;white-space:pre;padding-right:16px}
+.ln .no{color:var(--muted);text-align:right;padding-right:.8em;opacity:.7}
+.ln .st{text-align:center}
+.st b{display:inline-block;min-width:1.55em;border-radius:999px;background:var(--fg);color:var(--bg);
+  font-size:11px;line-height:1.55em;text-align:center;font-family:-apple-system,sans-serif}
+.ln.api{background:var(--theirs-bg);box-shadow:inset 4px 0 0 var(--theirs)}
+.ln.call{background:var(--mine-bg);box-shadow:inset 4px 0 0 var(--mine)}
+.ln.guard{background:var(--warn-bg);box-shadow:inset 4px 0 0 var(--warn)}
+.ln.gap .no{opacity:.35}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:4px;margin-right:6px}
+.tag.api{background:var(--theirs-bg);color:var(--theirs)}
+.tag.call{background:var(--mine-bg);color:var(--mine)}
+.tag.guard{background:var(--warn-bg);color:var(--warn)}
+.notes{display:grid;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.notes li{max-width:none;font-size:14px;padding-left:2.2em;position:relative}
+.notes li .st{position:absolute;left:0;top:.15em}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.box h3{font-size:14px;margin:0 0 6px}
+.box .code{padding:8px 0}
+.two.wide{grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+@media (max-width:520px){ .two.wide{grid-template-columns:1fr} }
+.callout{border-left:4px solid var(--mine);background:var(--mine-bg);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-bg)}
+.callout p{margin:0;max-width:none}
+
+/* ── 処理フロー ── */
+.flow{display:grid;gap:6px;margin:10px 0}
+.fstep{display:grid;grid-template-columns:2.2em 1fr auto;gap:10px;align-items:start;
+  background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.fstep .q{font-weight:650}
+.fstep .yn{font-size:13.5px;color:var(--muted)}
+.fstep .yn b{color:var(--fg)}
+.fstep .line{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.fstep.guard{border-color:var(--warn)}
+@media (max-width:560px){ .fstep{grid-template-columns:2.2em 1fr} .fstep .line{grid-column:2} }
+
+/* SVG */
+.t-lane{font-size:15px;font-weight:700}
+.t-sub{font-size:12px}
+.t-lab{font-size:13px;font-weight:650}
+.t-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+.halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>シナリオ1のコード地図</h1>
+  <p class="lede"><code>labs/scenario1-no-mcp/</code> の <code>agent.py</code> と <code>tools.py</code> を題材に、次の2点を実際のコード上で示します。①どの名前が Anthropic の仕様で決まっていて、どの名前を自分で決めたのか。②どこで API を呼び、どこから自分の関数になるのか。</p>
+  <div class="legend">
+    <span class="chip"><span class="sw" style="background:var(--theirs)"></span><span class="a">オレンジ</span> = Anthropic の仕様で固定（変えると動かない）</span>
+    <span class="chip"><span class="sw" style="background:var(--mine)"></span><span class="m">青緑</span> = 自分で決めた名前（自由に変えられる）</span>
+    <span class="chip"><span class="sw" style="background:var(--val)"></span><span class="v">灰色の斜体</span> = 実行時に決まる値</span>
+    <span class="chip"><span class="js">点線付きオレンジ</span> = JSON Schema の語（これも仕様で固定）</span>
+  </div>
+</header>
+
+<!-- ─────────────────────────────── 1 ─── -->
+<h2><span class="n">01</span>全体図：渡す・返る・呼ぶの往復</h2>
+<p class="claim">API を呼んでいるのは <code><span class="m">client</span>.<span class="a">messages.create</span>(...)</code> の1か所（78行目）だけです。それ以外は、すべて自分の Python プロセスの中で動いています。</p>
+<figure>
+<div class="scroll">
+<svg class="diagram" viewBox="0 0 1000 640" role="img" aria-label="自分の関数、自分のコード、Anthropic API の3レーン間でのやりとりを7ステップで示すシーケンス図">
+  <defs>
+    <marker id="hm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--mine)"/></marker>
+    <marker id="ht" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--theirs)"/></marker>
+  </defs>
+
+  <!-- 自分のプロセス / API の外側 -->
+  <rect x="10" y="10" width="665" height="585" rx="12" fill="var(--mine-bg)" opacity=".45"/>
+  <rect x="705" y="10" width="285" height="585" rx="12" fill="var(--theirs-bg)" opacity=".6"/>
+  <text x="22" y="32" class="t-sub" fill="var(--mine)" font-weight="700">自分のパソコン（1つの Python プロセス）</text>
+  <text x="717" y="32" class="t-sub" fill="var(--theirs)" font-weight="700">Anthropic のサーバー</text>
+  <line x1="690" y1="14" x2="690" y2="592" stroke="var(--theirs)" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="690" y="615" text-anchor="middle" class="t-lab" fill="var(--theirs)">↑ API の境界（ネットワーク越し）</text>
+
+  <!-- レーン見出し -->
+  <rect x="55" y="46" width="190" height="52" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.5"/>
+  <text x="150" y="68" text-anchor="middle" class="t-lane" fill="var(--mine)">自分の関数</text>
+  <text x="150" y="88" text-anchor="middle" class="t-mono" fill="var(--muted)">tools.py（IMPL）</text>
+  <rect x="385" y="46" width="230" height="52" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.5"/>
+  <text x="500" y="68" text-anchor="middle" class="t-lane" fill="var(--mine)">自分のコード</text>
+  <text x="500" y="88" text-anchor="middle" class="t-mono halo" fill="var(--muted)">agent.py（run_once のループ）</text>
+  <rect x="755" y="46" width="190" height="52" rx="8" fill="var(--card)" stroke="var(--theirs)" stroke-width="1.5"/>
+  <text x="850" y="68" text-anchor="middle" class="t-lane" fill="var(--theirs)">Anthropic API</text>
+  <text x="850" y="88" text-anchor="middle" class="t-mono halo" fill="var(--muted)">Claude（ここで考える）</text>
+
+  <!-- ライフライン -->
+  <line x1="150" y1="98" x2="150" y2="585" stroke="var(--line)" stroke-width="2"/>
+  <line x1="500" y1="98" x2="500" y2="585" stroke="var(--line)" stroke-width="2"/>
+  <line x1="850" y1="98" x2="850" y2="585" stroke="var(--line)" stroke-width="2"/>
+
+  <!-- ① 渡す -->
+  <text x="515" y="130" class="t-lab halo" fill="var(--fg)">① 渡す　<tspan class="t-mono">create(...)</tspan>　<tspan fill="var(--muted)" font-weight="400">L78</tspan></text>
+  <line x1="500" y1="140" x2="846" y2="140" stroke="var(--theirs)" stroke-width="2.2" marker-end="url(#ht)"/>
+  <text x="515" y="158" class="t-mono halo" fill="var(--muted)">model / system / tools=DEFS / messages</text>
+
+  <!-- ② 返る -->
+  <text x="835" y="192" text-anchor="end" class="t-lab halo" fill="var(--fg)">② 返る　<tspan class="t-mono">res</tspan>（戻り値）</text>
+  <line x1="850" y1="202" x2="504" y2="202" stroke="var(--theirs)" stroke-width="2.2" marker-end="url(#ht)"/>
+  <text x="835" y="220" text-anchor="end" class="t-mono halo" fill="var(--muted)">stop_reason="tool_use" / tool_use ブロック</text>
+
+  <!-- ③ 振り分け -->
+  <rect x="330" y="240" width="340" height="62" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.5"/>
+  <text x="500" y="263" text-anchor="middle" class="t-lab halo" fill="var(--fg)">③ 中身を見て振り分ける　<tspan fill="var(--muted)" font-weight="400">L94–118</tspan></text>
+  <text x="500" y="287" text-anchor="middle" class="t-mono halo" fill="var(--muted)">stop_reason → b.type → 本人確認済み？(A)</text>
+
+  <!-- ④ 呼ぶ -->
+  <text x="485" y="338" text-anchor="end" class="t-lab" fill="var(--fg)">④ 呼ぶ　<tspan fill="var(--muted)" font-weight="400">L124</tspan></text>
+  <line x1="500" y1="348" x2="154" y2="348" stroke="var(--mine)" stroke-width="2.2" marker-end="url(#hm)"/>
+  <text x="485" y="366" text-anchor="end" class="t-mono" fill="var(--muted)">tools.IMPL[b.name](**b.input)</text>
+
+  <!-- ⑤ 戻り値 -->
+  <text x="165" y="400" class="t-lab" fill="var(--fg)">⑤ 戻る　<tspan class="t-mono">out</tspan>（ただの dict）</text>
+  <line x1="150" y1="410" x2="496" y2="410" stroke="var(--mine)" stroke-width="2.2" marker-end="url(#hm)"/>
+  <text x="165" y="428" class="t-mono" fill="var(--muted)">{"verified": true, "customer_id": ...}</text>
+
+  <!-- ⑥ 再び渡す -->
+  <text x="515" y="466" class="t-lab halo" fill="var(--fg)">⑥ 渡す　もう一度 create(...)　<tspan fill="var(--muted)" font-weight="400">L140→L78</tspan></text>
+  <line x1="500" y1="476" x2="846" y2="476" stroke="var(--theirs)" stroke-width="2.2" marker-end="url(#ht)"/>
+  <text x="515" y="494" class="t-mono halo" fill="var(--muted)">messages に tool_result を足して再送</text>
+
+  <!-- ⑦ 終わり -->
+  <text x="835" y="530" text-anchor="end" class="t-lab halo" fill="var(--fg)">⑦ 返る　<tspan class="t-mono">stop_reason="end_turn"</tspan></text>
+  <line x1="850" y1="540" x2="504" y2="540" stroke="var(--theirs)" stroke-width="2.2" marker-end="url(#ht)"/>
+  <text x="835" y="558" text-anchor="end" class="t-mono halo" fill="var(--muted)">→ L95 の break でループ終了</text>
+
+  <!-- ループ括弧 -->
+  <path d="M40,140 h-14 v336 h14" fill="none" stroke="var(--muted)" stroke-width="1.5"/>
+  <text x="18" y="310" class="t-sub" fill="var(--muted)" transform="rotate(-90 18 310)" text-anchor="middle">tool_use の間くり返す（最大8周）</text>
+</svg>
+</div>
+<figcaption>オレンジの矢印は API の境界を越える通信で、①⑥が「渡す」（リクエスト）、②⑦が「返る」（レスポンス）です。青緑の矢印④⑤は、同じプロセスの中で行う普通の関数呼び出しです。Claude から <code>tools.py</code> へ直接つながる線はありません。</figcaption>
+</figure>
+
+<!-- ─────────────────────────────── 2 ─── -->
+<h2><span class="n">02</span>agent.py のループを色分けする</h2>
+<p class="claim">同じ行の中でも、固定の名前と自分で決めた名前が混ざっています。たとえば <code><span class="a">tools=</span><span class="m">tools</span>.<span class="m">DEFS</span></code> は、左の <code>tools=</code> が API の引数名（固定）、右の <code>tools.DEFS</code> が自分のモジュール名と変数名です。</p>
+
+<div class="code" role="region" aria-label="agent.py 51〜94行目">
+<div class="ln"><span class="no">72</span><span class="st"></span><span>    <b>for</b> <span class="m">turn</span> <b>in</b> range(<span class="m">MAX_TURNS</span>):</span></div>
+<div class="ln api"><span class="no">78</span><span class="st"><b>①</b></span><span>        <span class="m">res</span> = <span class="m">client</span>.<span class="a">messages</span>.<span class="a">create</span>(          <span class="c"># ━━ API はここだけ ━━</span></span></div>
+<div class="ln api"><span class="no">79</span><span class="st"></span><span>            <span class="a">model</span>=<span class="m">MODEL</span>, <span class="a">max_tokens</span>=<span class="m">MAX_TOKENS</span>,</span></div>
+<div class="ln api"><span class="no">80</span><span class="st"></span><span>            <span class="a">system</span>=<span class="m">system</span>, <span class="a">tools</span>=<span class="m">tools</span>.<span class="m">DEFS</span>, <span class="a">messages</span>=<span class="m">messages</span>,</span></div>
+<div class="ln api"><span class="no">81</span><span class="st"><b>②</b></span><span>        )                                            <span class="c"># ← ここで res が「返ってくる」</span></span></div>
+<div class="ln"><span class="no">88</span><span class="st"></span><span>        <span class="m">messages</span>.append({<span class="a">"role"</span>: <span class="a">"assistant"</span>, <span class="a">"content"</span>: <span class="m">res</span>.<span class="a">content</span>})</span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span>        <span class="c"># (89–91 は verbose 表示)</span></span></div>
+<div class="ln"><span class="no">94</span><span class="st"><b>③</b></span><span>        <b>if</b> <span class="m">res</span>.<span class="a">stop_reason</span> != <span class="a">"tool_use"</span>:</span></div>
+<div class="ln"><span class="no">95</span><span class="st"><b>⑦</b></span><span>            <b>break</b>                                    <span class="c"># "end_turn" など → 終了</span></span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln"><span class="no">97</span><span class="st"></span><span>        <span class="m">results</span> = []</span></div>
+<div class="ln"><span class="no">98</span><span class="st"><b>③</b></span><span>        <b>for</b> <span class="m">b</span> <b>in</b> <span class="m">res</span>.<span class="a">content</span>:</span></div>
+<div class="ln"><span class="no">99</span><span class="st"></span><span>            <b>if</b> <span class="m">b</span>.<span class="a">type</span> != <span class="a">"tool_use"</span>:           <span class="c"># "text" ブロックは読み飛ばす</span></span></div>
+<div class="ln"><span class="no">100</span><span class="st"></span><span>                <b>continue</b></span></div>
+<div class="ln"><span class="no">103</span><span class="st"></span><span>            <span class="m">called</span>.append(<span class="m">b</span>.<span class="a">name</span>)</span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln guard"><span class="no">107</span><span class="st"><b>A</b></span><span>            <b>if</b> <span class="m">b</span>.<span class="a">name</span> <b>in</b> <span class="m">VERIFY_REQUIRED</span> <b>and</b> <span class="m">verified_id</span> <b>is</b> None:</span></div>
+<div class="ln guard"><span class="no">108</span><span class="st"></span><span>                <span class="m">incident</span> = True</span></div>
+<div class="ln guard"><span class="no">109</span><span class="st"></span><span>                <b>if</b> <span class="m">guard</span> == <span class="m">"programmatic"</span>:</span></div>
+<div class="ln guard"><span class="no">113</span><span class="st"></span><span>                    <span class="m">results</span>.append({<span class="a">"type"</span>: <span class="a">"tool_result"</span>, <span class="a">"tool_use_id"</span>: <span class="m">b</span>.<span class="a">id</span>, <span class="a">"is_error"</span>: True,</span></div>
+<div class="ln guard"><span class="no">114</span><span class="st"></span><span>                                    <span class="a">"content"</span>: json.dumps({<span class="m">"error"</span>: <span class="v">"本人確認が未完了です…"</span>})})</span></div>
+<div class="ln guard"><span class="no">118</span><span class="st"></span><span>                    <b>continue</b>                         <span class="c"># ← ④ に進ませない</span></span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln call"><span class="no">124</span><span class="st"><b>④</b></span><span>                <span class="m">out</span> = <span class="m">tools</span>.<span class="m">IMPL</span>[<span class="m">b</span>.<span class="a">name</span>](**<span class="m">b</span>.<span class="a">input</span>)   <span class="c"># ━━ 自分の関数を自分で呼ぶ ━━</span></span></div>
+<div class="ln call"><span class="no"></span><span class="st"><b>⑤</b></span><span>                <span class="c">#   ↑ 戻り値 out は tools.py が返したただの dict</span></span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln"><span class="no">130</span><span class="st"></span><span>            <b>if</b> <span class="m">b</span>.<span class="a">name</span> == <span class="m">"get_customer"</span> <b>and</b> <span class="m">out</span>.get(<span class="m">"verified"</span>):</span></div>
+<div class="ln"><span class="no">131</span><span class="st"></span><span>                <span class="m">verified_id</span> = <span class="m">out</span>[<span class="m">"customer_id"</span>]           <span class="c"># A の判定材料を記録</span></span></div>
+<div class="ln"><span class="no">136</span><span class="st"></span><span>            <span class="m">results</span>.append({<span class="a">"type"</span>: <span class="a">"tool_result"</span>, <span class="a">"tool_use_id"</span>: <span class="m">b</span>.<span class="a">id</span>,</span></div>
+<div class="ln"><span class="no">137</span><span class="st"></span><span>                            <span class="a">"content"</span>: json.dumps(<span class="m">out</span>)})</span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln"><span class="no">140</span><span class="st"><b>⑥</b></span><span>        <span class="m">messages</span>.append({<span class="a">"role"</span>: <span class="a">"user"</span>, <span class="a">"content"</span>: <span class="m">results</span>})   <span class="c"># → 次の周で ① へ</span></span></div>
+</div>
+<p style="font-size:12.5px;color:var(--muted);margin-top:6px">※ 見やすさのため、ファイル内の 🟧🟦 コメントと一部の行を省略・短縮しています。行番号は実ファイルと一致します。</p>
+
+<p><span class="tag api">API</span>78–81行目だけが Anthropic とのやりとりです。<span class="tag call">自分の関数</span>124行目で <code>tools.py</code> の関数を呼んでいます。<span class="tag guard">A のガード</span>107–118行目は、自分の関数を呼ぶ前に止める関門です。</p>
+
+<ul class="notes">
+  <li><span class="st"><b>②</b></span><code class="m">res</code> は <code>create()</code> の戻り値です。<code class="a">.stop_reason</code> <code class="a">.content</code> という属性名は SDK が決めていますが、<code>res</code> という変数名は自分で付けたものなので、<code>resp</code> でも <code>r</code> でも動きます。</li>
+  <li><span class="st"><b>③</b></span>返ってきた <code class="a">content</code> はブロックのリストです。<code class="a">type</code> が <code class="a">"text"</code> なら Claude の発言、<code class="a">"tool_use"</code> なら「このツールを呼んでほしい」という依頼です。</li>
+  <li><span class="st"><b>④</b></span><code class="a">b.name</code> の<em>中身</em>は <code class="m">"lookup_order"</code> のような自分で決めた名前です。自分が DEFS に書いた名前を Claude がそのまま返してくるので、それを <code class="m">IMPL</code> の辞書で引いて関数を取り出します。名前と関数を結び付けているのは自分のコードで、Anthropic は関与しません。</li>
+  <li><span class="st"><b>⑥</b></span>結果は <code class="a">"role": "user"</code> のメッセージに入れて返します。<code class="a">"tool_use_id"</code> に <code class="a">b.id</code> を入れることで、どの依頼への答えなのかを Claude に伝えます。</li>
+</ul>
+
+<!-- ─────────────────────────────── 3 ─── -->
+<h2><span class="n">03</span>tools.py：Claude に渡す説明書と、実際の関数</h2>
+<p class="claim">同じ <code class="m">get_customer</code> という名前が2か所に出てきますが、役割が違います。<code class="m">DEFS</code> は Claude に<strong>渡す</strong>説明書、<code class="m">IMPL</code> は自分のコードが<strong>呼ぶ</strong>関数です。</p>
+<div class="two">
+  <div class="box">
+    <h3><span class="tag api">境界を越える</span>DEFS（L92〜）＝ 説明書</h3>
+<div class="code">
+<div class="ln"><span class="no">92</span><span class="st"><b>①</b></span><span><span class="m">DEFS</span> = [</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  {</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    <span class="a">"name"</span>: <span class="m">"get_customer"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    <span class="a">"description"</span>: <span class="m">"顧客を本人確認する…"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    <span class="a">"input_schema"</span>: {</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>      <span class="js">"type"</span>: <span class="js">"object"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>      <span class="js">"properties"</span>: {</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>        <span class="m">"email"</span>: {<span class="js">"type"</span>: <span class="js">"string"</span>},</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>        <span class="m">"name"</span>:  {<span class="js">"type"</span>: <span class="js">"string"</span>}}},</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  },  <span class="c"># lookup_order / process_refund / …</span></span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>]</span></div>
+</div>
+    <p style="font-size:13.5px">外側のキー <code class="a">name</code> / <code class="a">description</code> / <code class="a">input_schema</code> は Anthropic の仕様で決まっています。その中身、つまりツール名・説明文・引数名 <code class="m">email</code> は自分で決めたものです。<code class="js">type</code> <code class="js">properties</code> などは JSON Schema の書き方です。</p>
+    <p style="font-size:13.5px">なお、<code class="m">"name"</code>（引数名）は外側の <code class="a">"name"</code>（ツール名のキー）とは無関係で、たまたま同じ綴りなだけです。</p>
+  </div>
+  <div class="box">
+    <h3><span class="tag call">境界を越えない</span>IMPL（L83）＝ 実体</h3>
+<div class="code">
+<div class="ln"><span class="no">30</span><span class="st"></span><span><b>def</b> <span class="m">get_customer</span>(<span class="m">email</span>=None, <span class="m">name</span>=None):</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    <span class="c"># infra/db.py 経由で shop.db を検索する</span></span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    <b>return</b> {<span class="m">"customer_id"</span>: …, <span class="m">"verified"</span>: True}</span></div>
+<div class="ln gap"><span class="no">⋮</span><span class="st"></span><span></span></div>
+<div class="ln"><span class="no">83</span><span class="st"><b>④</b></span><span><span class="m">IMPL</span> = {</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="m">"get_customer"</span>:   <span class="m">get_customer</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="m">"lookup_order"</span>:   <span class="m">lookup_order</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="m">"process_refund"</span>: <span class="m">process_refund</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="m">"escalate_to_human"</span>: <span class="m">escalate_to_human</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>}</span></div>
+</div>
+    <p style="font-size:13.5px">ここは<strong>全部が青緑</strong>です。Anthropic の仕様はまったく出てきません。Claude がこのファイルの中身を見ることはなく、関数を直接呼ぶこともありません。</p>
+    <p style="font-size:13.5px">守る必要があるのは「<code class="m">DEFS</code> の <code class="a">name</code> と <code class="m">IMPL</code> のキーを揃える」「<code class="a">input_schema</code> の引数名と関数の引数名を揃える」の2点だけです。これは <code>**b.input</code> で引数を展開して渡すために、自分で決めた約束事です。</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 4 ─── -->
+<h2><span class="n">04</span>境界を越えるデータの中身</h2>
+<p class="claim">①②⑥で実際にネットワークを流れる JSON です。Python のコードは SDK によってこの形に変換されます。</p>
+<div class="two wide">
+  <div class="box">
+    <h3>① 渡す（リクエスト）</h3>
+<div class="code">
+<div class="ln"><span class="no"></span><span class="st"></span><span>{</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"model"</span>: <span class="a">"claude-haiku-4-5"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"max_tokens"</span>: <span class="v">700</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"system"</span>: <span class="m">"あなたはECサイトの…"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"tools"</span>: [ <span class="c">/* DEFS の4本 */</span> ],</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"messages"</span>: [</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    {<span class="a">"role"</span>: <span class="a">"user"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"content"</span>: <span class="m">"田中です。先週注文した…"</span>}</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  ]</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>}</span></div>
+</div>
+    <p style="font-size:13px">モデル ID の <code class="a">"claude-haiku-4-5"</code> は Anthropic が決めた値です。どれを使うかは自分で選びますが、綴りは変えられません。</p>
+  </div>
+  <div class="box">
+    <h3>② 返る（レスポンス ＝ <code>res</code>）</h3>
+<div class="code">
+<div class="ln"><span class="no"></span><span class="st"></span><span>{</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"type"</span>: <span class="a">"message"</span>, <span class="a">"role"</span>: <span class="a">"assistant"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"stop_reason"</span>: <span class="a">"tool_use"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  <span class="a">"content"</span>: [</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    {<span class="a">"type"</span>: <span class="a">"text"</span>, <span class="a">"text"</span>: <span class="v">"お調べします。"</span>},</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    {<span class="a">"type"</span>: <span class="a">"tool_use"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"id"</span>: <span class="v">"toolu_01A…"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"name"</span>: <span class="m">"lookup_order"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"input"</span>: {<span class="m">"customer_name"</span>: <span class="v">"田中"</span>}}</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  ]</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>}</span></div>
+</div>
+    <p style="font-size:13px">青緑の名前は、自分が DEFS に書いた名前がそのまま返ってきたものです。灰色の値（<code class="v">"田中"</code>、ID など）は Claude がその場で決めています。事故の原因は、この <code class="v">"田中"</code> だけで注文を引こうとしたことです。</p>
+  </div>
+  <div class="box">
+    <h3>⑥ 再び渡す（messages に2件追加）</h3>
+<div class="code">
+<div class="ln"><span class="no"></span><span class="st"></span><span><span class="a">"messages"</span>: [</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  { <span class="c">/* ① の user */</span> },</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  {<span class="a">"role"</span>: <span class="a">"assistant"</span>, <span class="a">"content"</span>: [ <span class="c">/* ②の content */</span> ]},</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  {<span class="a">"role"</span>: <span class="a">"user"</span>, <span class="a">"content"</span>: [</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>    {<span class="a">"type"</span>: <span class="a">"tool_result"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"tool_use_id"</span>: <span class="v">"toolu_01A…"</span>,</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>     <span class="a">"content"</span>: <span class="m">'{"orders": […]}'</span>}</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>  ]}</span></div>
+<div class="ln"><span class="no"></span><span class="st"></span><span>]</span></div>
+</div>
+    <p style="font-size:13px">API はステートレスで、前回のやりとりを覚えていません。そのため毎回、履歴全体を渡し直します。<code class="a">tool_use_id</code> には②の <code class="a">id</code> をそのまま入れます。</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────── 5 ─── -->
+<h2><span class="n">05</span>返ってきたものの処理手順</h2>
+<p class="claim">②で <code>res</code> を受け取ってから、⑥で渡し直すまでに自分のコードが判定している内容です。</p>
+<div class="flow">
+  <div class="fstep"><span class="st"><b>③</b></span><div><div class="q"><code class="a">res.stop_reason</code> は <code class="a">"tool_use"</code> か？</div><div class="yn"><b>違う</b>（<code class="a">"end_turn"</code> など）→ Claude の回答は完成しているので break して終了（⑦）。<b>そう</b> → 次へ。</div></div><span class="line">L94–95</span></div>
+  <div class="fstep"><span class="st"><b>③</b></span><div><div class="q"><code class="a">res.content</code> のブロックを1つずつ見る。<code class="a">b.type</code> は <code class="a">"tool_use"</code> か？</div><div class="yn"><b>違う</b>（<code class="a">"text"</code>）→ 読み飛ばす。<b>そう</b> → A へ。</div></div><span class="line">L98–100</span></div>
+  <div class="fstep guard"><span class="st"><b>A</b></span><div><div class="q"><code class="a">b.name</code> が <code class="m">VERIFY_REQUIRED</code> に含まれ、まだ本人確認をしていないか？</div><div class="yn"><b>そう</b> → 関数は<strong>呼ばず</strong>、<code class="a">"is_error": True</code> の <code class="a">tool_result</code> を作る（選択肢 A）。<b>違う</b> → ④ へ。</div></div><span class="line">L107–118</span></div>
+  <div class="fstep"><span class="st"><b>④</b></span><div><div class="q"><code class="m">IMPL</code>[<code class="a">b.name</code>] で関数を取り出し、<code class="a">b.input</code> を引数にして呼ぶ</div><div class="yn">⑤ 戻り値 <code class="m">out</code> を受け取る。<code class="m">get_customer</code> が <code class="m">verified</code> を返していれば、<code class="m">verified_id</code> に記録する。</div></div><span class="line">L124–131</span></div>
+  <div class="fstep"><span class="st"><b>⑥</b></span><div><div class="q"><code class="a">tool_result</code> を作って <code class="m">results</code> に追加する</div><div class="yn"><code class="a">tool_use_id</code> = <code class="a">b.id</code>、<code class="a">content</code> = <code class="m">out</code> を JSON 文字列にしたもの。</div></div><span class="line">L136–137</span></div>
+  <div class="fstep"><span class="st"><b>⑥</b></span><div><div class="q">全ブロックを処理したら、<code class="m">results</code> を <code class="a">"user"</code> のメッセージとして追加する</div><div class="yn">ループの先頭に戻り、①の <code>create()</code> を再度呼ぶ。</div></div><span class="line">L140</span></div>
+</div>
+
+<div class="callout warn"><p><strong>試験のポイント：A が確実に効く理由。</strong> B（システムプロンプト）と C（Few-shot）は、①で<em>渡すもの</em>を変える対策です。Claude がそれに従うかは確率で決まるため、②で危険な依頼が返ってくる可能性が残ります。A は境界の<em>こちら側</em>、④の手前にある if 文です。②で何が返ってきても、自分のコードが関数を呼ばなければ返金は実行されません。</p></div>
+
+<!-- ─────────────────────────────── 6 ─── -->
+<h2><span class="n">06</span>名前の早見表</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>場所</th><th><span class="a">Anthropic の仕様で固定</span></th><th><span class="m">自分で決めた</span></th></tr></thead>
+<tbody>
+<tr><td>API の呼び方</td><td><code class="a">anthropic.Anthropic()</code> <code class="a">.messages.create()</code>、環境変数 <code class="a">ANTHROPIC_API_KEY</code></td><td><code class="m">client</code> <code class="m">res</code>（変数名）</td></tr>
+<tr><td>create の引数</td><td><code class="a">model</code> <code class="a">max_tokens</code> <code class="a">system</code> <code class="a">tools</code> <code class="a">messages</code></td><td>渡す中身：<code class="m">MODEL</code> <code class="m">system</code> <code class="m">DEFS</code> <code class="m">messages</code></td></tr>
+<tr><td>メッセージ</td><td><code class="a">role</code> <code class="a">content</code> / <code class="a">"user"</code> <code class="a">"assistant"</code></td><td>本文（<code class="m">USER_MSG</code>、<code class="m">FEWSHOT</code>）</td></tr>
+<tr><td>ツール定義</td><td><code class="a">name</code> <code class="a">description</code> <code class="a">input_schema</code>（＋JSON Schema の語）</td><td><code class="m">get_customer</code> などのツール名、説明文、引数名</td></tr>
+<tr><td>レスポンス</td><td><code class="a">stop_reason</code>（<code class="a">"tool_use"</code> / <code class="a">"end_turn"</code> …）、<code class="a">content</code>、ブロックの <code class="a">type</code> <code class="a">id</code> <code class="a">name</code> <code class="a">input</code></td><td>—（<code class="a">name</code> の値は自分のツール名が返ってくる）</td></tr>
+<tr><td>結果の返却</td><td><code class="a">"tool_result"</code> <code class="a">tool_use_id</code> <code class="a">content</code> <code class="a">is_error</code></td><td><code class="m">results</code>、結果の中身（<code class="m">verified</code> <code class="m">error</code> など）</td></tr>
+<tr><td>実体とガード</td><td>—（Anthropic は関与しない）</td><td><code class="m">IMPL</code> <code class="m">VERIFY_REQUIRED</code> <code class="m">verified_id</code>、tools.py の関数すべて</td></tr>
+<tr><td>自社DB</td><td>—（Anthropic は関与しない）</td><td>infra/db.py の関数、shop.db のテーブル名・列名すべて</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>
+題材: <code>labs/scenario1-no-mcp/agent.py</code>・<code>tools.py</code>（行番号は 2026-09-17 時点）。関連: <a href="02_scenario1.html">02 シナリオ1の解剖</a> / <a href="01_agent-overview.html">01 エージェントの全体像</a>
+</footer>
+</div>

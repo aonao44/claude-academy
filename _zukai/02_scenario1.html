@@ -128,8 +128,8 @@ footer li{font-size:12.5px}
         <text class="t-mono" x="183" y="206" text-anchor="middle" fill="var(--mine)">DEFS ＝ 説明書（JSON）</text>
         <text class="t-sub" x="183" y="222" text-anchor="middle" fill="var(--muted)">名前・description・input_schema</text>
         <text class="t-mono" x="183" y="242" text-anchor="middle" fill="var(--fg)">IMPL ＝ 実体（Python 関数）</text>
-        <text class="t-title" x="183" y="372" text-anchor="middle" fill="var(--fg)">ダミーDB</text>
-        <text class="t-sub" x="183" y="392" text-anchor="middle" fill="var(--muted)">CUSTOMERS / ORDERS</text>
+        <text class="t-title" x="183" y="372" text-anchor="middle" fill="var(--fg)">自社DB（SQLite）</text>
+        <text class="t-sub" x="183" y="392" text-anchor="middle" fill="var(--muted)">db.py → shop.db</text>
         <text class="t-sub" x="183" y="410" text-anchor="middle" fill="var(--muted)">ただの dict（田中が3人）</text>
         <text class="t-title" x="535" y="182" text-anchor="middle" fill="var(--fg)">agent.py</text>
         <text class="t-sub" x="535" y="204" text-anchor="middle" fill="var(--muted)">for turn in range(8) のループ</text>
@@ -143,7 +143,7 @@ footer li{font-size:12.5px}
         <text class="t-arrow" x="729" y="112" text-anchor="middle" fill="var(--theirs)">HTTPS</text>
         <text class="t-arrow" x="729" y="130" text-anchor="middle" fill="var(--theirs)">DEFS ＋ 履歴</text>
         <text class="t-arrow" x="729" y="220" text-anchor="middle" fill="var(--theirs)">tool_use / end_turn</text>
-        <text class="t-note" x="36" y="508" fill="var(--fg)">境界を越えるのは DEFS（説明書）と会話履歴だけ。IMPL（関数の中身）もダミーDBも、プロセスの外には一切出ない。</text>
+        <text class="t-note" x="36" y="508" fill="var(--fg)">境界を越えるのは DEFS（説明書）と会話履歴だけ。IMPL（関数の中身）も自社DBも、プロセスの外には一切出ない。</text>
         <text class="t-note" x="36" y="526" fill="var(--muted)">だから Claude は「get_customer を呼びたい」と言えるだけで、DB を読むことはできない。</text>
       </svg>
 <figcaption><code>tools.py</code> の中で <b><code>DEFS</code> と <code>IMPL</code> が別々に置かれている</b>のがこの構成の要。<code>DEFS</code> は Claude に送られ、<code>IMPL</code> は <code>agent.py</code> だけが呼ぶ。</figcaption>

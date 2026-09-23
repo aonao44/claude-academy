@@ -1,0 +1,541 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ドメイン1 用語リファレンス</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --val:#6b6760; --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7; --ok:#2e7d32; --ok-bg:#e8f5e9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --val:#a9a4b3; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --val:#a9a4b3; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.7}
+.wrap{max-width:1100px;margin:0 auto;padding-block:24px;padding-inline:16px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px;margin-bottom:8px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 4px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:12px}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+h3{font-size:15.5px;margin:22px 0 4px}
+p,li{font-size:14.5px}
+p{max-width:78ch}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+pre{background:var(--code-bg);border-radius:8px;padding:11px 13px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.6}
+pre code{background:none;padding:0}
+.a{color:var(--theirs);font-weight:650}
+.m{color:var(--mine);font-weight:650}
+.v{color:var(--val);font-style:italic}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600;white-space:nowrap}
+td code{white-space:nowrap}
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px}
+.note.warn{border-color:var(--warn);background:var(--warn-bg)}
+.note.api{border-color:var(--theirs);background:var(--theirs-bg)}
+.note p{margin:0;max-width:none}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.toc a{font-size:13px;text-decoration:none;color:var(--fg);border:1px solid var(--line);
+  background:var(--card);border-radius:999px;padding:3px 11px}
+.toc a:hover{border-color:var(--mine);color:var(--mine)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin:12px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px}
+.box h3{margin-top:2px}
+.box.ok{border-color:var(--ok)} .box.ng{border-color:var(--warn)}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:4px;margin-right:6px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)} .tag.ng{background:var(--warn-bg);color:var(--warn)}
+figure{margin:12px 0;padding:10px 8px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.scroll{overflow-x:auto}
+svg.diagram{display:block;width:100%;min-width:700px;height:auto}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:6px;padding:0 4px}
+.t-lab{font-size:13px;font-weight:650}
+.t-mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+.qa{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0;margin:10px 0}
+.qa summary{cursor:pointer;padding:9px 13px;font-size:14.5px;font-weight:600;list-style-position:inside}
+.qa[open] summary{border-bottom:1px solid var(--line)}
+.qa .ans{padding:9px 13px;font-size:14px}
+.qa .ans p{margin:0 0 6px}
+.tree{background:var(--code-bg);border-radius:10px;padding:12px 14px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.8px;line-height:1.75;white-space:pre}
+.tree .k{color:var(--muted)}
+.steps{display:grid;gap:10px;margin:12px 0}
+.step{display:grid;grid-template-columns:2.6em minmax(0,1fr);gap:10px;background:var(--card);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.step .no{font-weight:800;font-size:18px;color:var(--muted);text-align:center;line-height:1.3}
+.step .who{display:inline-block;font-size:11.5px;font-weight:700;border-radius:4px;padding:1px 8px;margin-right:6px}
+.who.user{background:var(--code-bg);color:var(--fg)}
+.who.mine{background:var(--mine-bg);color:var(--mine)}
+.who.api{background:var(--theirs-bg);color:var(--theirs)}
+.step .ttl{font-weight:700;font-size:14.5px}
+.step p{margin:4px 0;font-size:14px;max-width:none}
+.step pre{margin:6px 0 0;font-size:12px}
+.step .line{font-size:12.5px;color:var(--muted)}
+.step.money{border-color:var(--warn)}
+.msgs-state{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.msgs-state span{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;border-radius:4px;padding:1px 7px;border:1px solid var(--line)}
+.msgs-state .u{background:var(--mine-bg);border-color:var(--mine)}
+.msgs-state .as{background:var(--theirs-bg);border-color:var(--theirs)}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>ドメイン1 用語リファレンス</h1>
+  <p class="lede">エージェント設計とオーケストレーション（配点 27%・約16問）。実装レベルで問われる固定の名前と、その使い方をまとめたもの。<span class="a">オレンジ</span>＝Anthropic の仕様で固定、<span class="m">青緑</span>＝自分で決める値。</p>
+  <div class="toc">
+    <a href="#s0a">00 ネスト構造</a><a href="#s0b">00 一連の流れ</a><a href="#s1">01 ループ制御</a><a href="#s2">02 リクエスト</a><a href="#s3">03 ブロック</a>
+    <a href="#s4">04 ツール定義</a><a href="#s5">05 tool_choice</a><a href="#s6">06 ツールの3分類</a>
+    <a href="#s7">07 往復の規則</a><a href="#s8">08 オーケストレーション</a><a href="#s9">09 コンテキスト</a>
+    <a href="#s10">10 ひっかけ</a><a href="#s11">11 英日対照</a>
+  </div>
+</header>
+
+<!-- 00a -->
+<h2 id="s0a"><span class="n">00</span>まず全体の構造 ─ 何が何の中に入っているか</h2>
+<p>固定語はバラバラの用語ではなく、<strong>1つの入れ子（ネスト）のどこかにある「キー」</strong>。先にこの木を頭に入れると、以降の表が全部この木の一部として読める。</p>
+<div class="tree"><span class="k">リクエスト（自分 → Claude）… client.messages.create(...) に渡すもの</span>
+├─ <span class="a">model</span>, <span class="a">max_tokens</span>, <span class="a">system</span>
+├─ <span class="a">tools</span> ［配列：説明書］
+│    └─ { <span class="a">name</span>, <span class="a">description</span>, <span class="a">input_schema</span> }         <span class="k">← 毎回同じ。実行結果は入らない</span>
+└─ <span class="a">messages</span> ［配列：会話の履歴］                          <span class="k">← 毎周増える</span>
+     ├─ { <span class="a">role</span>: <span class="a">"user"</span>,      <span class="a">content</span>: <span class="m">"田中です…"</span> }             <span class="k">← content は文字列でもよい</span>
+     ├─ { <span class="a">role</span>: <span class="a">"assistant"</span>, <span class="a">content</span>: ［ブロック, ブロック］ }  <span class="k">← ② をそのまま積む</span>
+     └─ { <span class="a">role</span>: <span class="a">"user"</span>,      <span class="a">content</span>: ［ブロック］ }
+                                    └─ { <span class="a">type</span>: <span class="a">"tool_result"</span>, <span class="a">tool_use_id</span>, <span class="a">content</span>, <span class="a">is_error</span> }
+
+<span class="k">レスポンス（Claude → 自分）… create() の戻り値 res</span>
+├─ <span class="a">id</span>, <span class="a">type</span>, <span class="a">role</span>: <span class="a">"assistant"</span>, <span class="a">model</span>, <span class="a">usage</span>
+├─ <span class="a">stop_reason</span>  <span class="k">← 単一の値（6つの候補のうち1つ）</span>
+└─ <span class="a">content</span> ［配列：ブロック］                             <span class="k">← 複数入る</span>
+     ├─ { <span class="a">type</span>: <span class="a">"text"</span>,     <span class="a">text</span>: <span class="v">"お調べします"</span> }
+     └─ { <span class="a">type</span>: <span class="a">"tool_use"</span>, <span class="a">id</span>, <span class="a">name</span>: <span class="m">"lookup_order"</span>, <span class="a">input</span>: {…} }</div>
+
+<div class="tbl">
+<table>
+<thead><tr><th>段</th><th>名前</th><th>中身</th><th>コードでの触り方</th></tr></thead>
+<tbody>
+<tr><td>1段目</td><td><code class="a">messages</code></td><td>会話の履歴（メッセージの配列）</td><td><code>messages.append(...)</code></td></tr>
+<tr><td>2段目</td><td>1通のメッセージ</td><td><code class="a">role</code>（誰の発言か）＋ <code class="a">content</code>（中身）</td><td><code>{"role": …, "content": …}</code></td></tr>
+<tr><td>3段目</td><td><strong>content ブロック</strong></td><td>中身の部品。<code class="a">type</code> で種類が決まる（<code class="a">text</code> / <code class="a">tool_use</code> / <code class="a">tool_result</code>）</td><td><code>for b in res.content:</code> → <code>b.type</code></td></tr>
+</tbody>
+</table>
+</div>
+<div class="note"><p><strong>要点。</strong>レスポンスの <code class="a">content</code> と、<code class="a">messages</code> の中の <code class="a">content</code> は<strong>同じ部品（ブロック）</strong>でできている。だから返ってきた <code>res.content</code> を、そのまま <code class="a">messages</code> に積み直せる。</p></div>
+
+<!-- 00b -->
+<h2 id="s0b"><span class="n">00</span>一連の流れ ─ 依頼から返事まで（実データ）</h2>
+<p>登場するのは4者：<span class="who user" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:4px;background:var(--code-bg)">エンドユーザー</span> <span class="who mine" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:4px">自分のコード（ループ）</span> <span class="who api" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:4px">Claude</span> と、自分の関数・DB。<strong>エンドユーザーと Claude は直接話さない。</strong>全部、自分のコードを経由する。以下は <code>labs/scenario1-no-mcp</code> の見本ログ（対策なし）そのもの。</p>
+<div class="steps">
+
+<div class="step"><div class="no">0</div><div>
+  <span class="who user">エンドユーザー</span><span class="ttl">依頼を書く</span>
+  <p>チャット画面などに入力する。この lab では画面の代わりに <code>agent.py</code> の <code class="m">USER_MSG</code> に入っている。</p>
+  <pre><code><span class="m">"田中です。先週注文したスニーカー、返品して返金してほしいです。急いでいます。"</span></code></pre>
+</div></div>
+
+<div class="step"><div class="no">1</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">最初のリクエストを組み立てて送る</span>
+  <p class="line">agent.py:64 で messages を作り、78 行目の <code>create()</code> で送信（ここだけが API）</p>
+  <pre><code>{ <span class="a">"model"</span>: <span class="a">"claude-haiku-4-5"</span>, <span class="a">"max_tokens"</span>: <span class="v">700</span>,
+  <span class="a">"system"</span>: <span class="m">"あなたはECサイトのカスタマーサポート担当です。…"</span>,
+  <span class="a">"tools"</span>: [ <span class="m">get_customer</span> / <span class="m">lookup_order</span> / <span class="m">process_refund</span> / <span class="m">escalate_to_human</span> の説明書 ],
+  <span class="a">"messages"</span>: [ { <span class="a">"role"</span>: <span class="a">"user"</span>, <span class="a">"content"</span>: <span class="m">"田中です。…"</span> } ] }</code></pre>
+  <div class="msgs-state">messages：<span class="u">user 依頼</span>（1件）</div>
+</div></div>
+
+<div class="step"><div class="no">2</div><div>
+  <span class="who api">Claude</span><span class="ttl">読んで判断し、レスポンスを返す</span>
+  <p>「本人確認より先に、名前で注文を探そう」と判断した（←これが事故の始まり）。返すのは<strong>依頼のデータ</strong>で、何も実行していない。</p>
+  <pre><code>{ <span class="a">"role"</span>: <span class="a">"assistant"</span>,
+  <span class="a">"content"</span>: [ { <span class="a">"type"</span>: <span class="a">"text"</span>, <span class="a">"text"</span>: <span class="v">"ご注文をお調べします。"</span> },
+               { <span class="a">"type"</span>: <span class="a">"tool_use"</span>, <span class="a">"id"</span>: <span class="v">"toolu_01"</span>, <span class="a">"name"</span>: <span class="m">"lookup_order"</span>,
+                 <span class="a">"input"</span>: { <span class="m">"customer_name"</span>: <span class="v">"田中"</span> } } ],
+  <span class="a">"stop_reason"</span>: <span class="a">"tool_use"</span> }</code></pre>
+</div></div>
+
+<div class="step"><div class="no">3</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">判定して、自分の関数を実行する</span>
+  <p class="line">88：返答を履歴に積む → 94：<code class="a">stop_reason</code> が <code class="a">"tool_use"</code> なので続行 → 98–99：<code class="a">content</code> から <code class="a">tool_use</code> ブロックを拾う → 107：A 関門（対策なしなので素通り）→ 124：<code>IMPL["lookup_order"](customer_name="田中")</code></p>
+  <pre><code><span class="c">-- tools.py → infra/db.py が実行した SQL</span>
+SELECT … FROM customers WHERE family_name || given_name LIKE '%田中%'   → 3人ヒット
+SELECT … FROM orders WHERE customer_id = 'C-8831'                       → 先頭の田中太郎の注文</code></pre>
+  <p>戻り値：<code class="m">{"orders": [{"order_id": "O-42", "item": "ランニングシューズ", "amount": 12800}], "ambiguous": true}</code><br>この時点では、Claude はこの結果を<strong>まだ知らない</strong>。Python の変数に入っているだけ。</p>
+</div></div>
+
+<div class="step"><div class="no">4</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">結果を tool_result に包んで積み、2回目を送る</span>
+  <p class="line">136：tool_result を作る → 140：<code class="a">role: "user"</code> で積む → ループ先頭へ戻り 78：再び <code>create()</code></p>
+  <pre><code>{ <span class="a">"role"</span>: <span class="a">"user"</span>, <span class="a">"content"</span>: [ { <span class="a">"type"</span>: <span class="a">"tool_result"</span>, <span class="a">"tool_use_id"</span>: <span class="v">"toolu_01"</span>,
+                                  <span class="a">"content"</span>: <span class="m">"{\"orders\": [{\"order_id\": \"O-42\", …}], \"ambiguous\": true}"</span> } ] }</code></pre>
+  <div class="msgs-state">messages：<span class="u">user 依頼</span><span class="as">assistant tool_use</span><span class="u">user tool_result</span>（3件・毎回全部送る）</div>
+</div></div>
+
+<div class="step"><div class="no">5</div><div>
+  <span class="who api">Claude</span><span class="ttl">結果を読み、次の依頼を返す</span>
+  <p><code>ambiguous: true</code>（名前だけで推測した）が付いているのに、そのまま返金へ進む判断をした。</p>
+  <pre><code><span class="a">"content"</span>: [ …, { <span class="a">"type"</span>: <span class="a">"tool_use"</span>, <span class="a">"name"</span>: <span class="m">"process_refund"</span>, <span class="a">"input"</span>: { <span class="m">"order_id"</span>: <span class="v">"O-42"</span> } } ],
+<span class="a">"stop_reason"</span>: <span class="a">"tool_use"</span></code></pre>
+</div></div>
+
+<div class="step money"><div class="no">6</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">実行する ─ ここでお金が動く</span>
+  <pre><code>SELECT … FROM orders WHERE order_id = 'O-42'
+INSERT INTO refunds (order_id, amount, to_customer_id) VALUES ('O-42', 12800, 'C-8831')   <span class="c">← 別人（田中太郎）に返金</span></code></pre>
+  <p><strong>選択肢 A を入れていれば、この手順は起きない。</strong>107 行目の関門が「本人確認がまだ」と判定し、手順3の時点で <code>lookup_order</code> すら実行せずに <code class="a">is_error: true</code> を返す。</p>
+</div></div>
+
+<div class="step"><div class="no">7</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">結果を積んで3回目を送る</span>
+  <div class="msgs-state">messages：<span class="u">user 依頼</span><span class="as">assistant</span><span class="u">user 結果</span><span class="as">assistant</span><span class="u">user 結果</span>（5件）</div>
+</div></div>
+
+<div class="step"><div class="no">8</div><div>
+  <span class="who api">Claude</span><span class="ttl">もう呼ぶツールがないので、最終回答を返す</span>
+  <pre><code><span class="a">"content"</span>: [ { <span class="a">"type"</span>: <span class="a">"text"</span>, <span class="a">"text"</span>: <span class="v">"ご注文 O-42 の返金（12,800円）を処理しました。"</span> } ],
+<span class="a">"stop_reason"</span>: <span class="a">"end_turn"</span>       <span class="c">← tool_use ブロックが無い</span></code></pre>
+</div></div>
+
+<div class="step"><div class="no">9</div><div>
+  <span class="who mine">自分のコード</span><span class="ttl">ループを抜けて、返事をエンドユーザーに渡す</span>
+  <p class="line">94：<code class="a">stop_reason</code> が <code class="a">"tool_use"</code> ではない → 95：<code>break</code></p>
+  <p>本物のアプリなら、最後の <code class="a">text</code> をチャット画面に表示する。この lab は採点用なので表示せず、誤返金の件数を集計している。</p>
+</div></div>
+</div>
+
+<div class="note api"><p><strong>エージェント ＝ Claude（判断）＋ 自分の関数（実行）＋ ループ（つなぐ・制御する）。</strong>自分が決めたのは「どんな道具があるか」と「回し方」だけで、<strong>どの順で道具を使うかは Claude がその場で決めた</strong>。柔軟な代わりに、手順2のように本人確認を飛ばす順番を選ぶこともある。だから手順3の前（107 行目）にコードの関門を置く、というのがドメイン1の結論。</p></div>
+
+<!-- 01 -->
+<h2 id="s1"><span class="n">01</span>ループ制御 ─ <code>stop_reason</code></h2>
+<p>ドメイン1で最も出る。<strong>ループの終わり方を決めるのは <code class="a">stop_reason</code> であって、本文テキストではない。</strong></p>
+<div class="tbl">
+<table>
+<thead><tr><th>値</th><th>意味</th><th>コードの動作</th></tr></thead>
+<tbody>
+<tr><td><code class="a">"tool_use"</code></td><td>ツールを呼んでほしい</td><td>実行して <code class="a">tool_result</code> を返し、ループを継続</td></tr>
+<tr><td><code class="a">"end_turn"</code></td><td>回答が完成した</td><td><strong>ループを抜ける</strong></td></tr>
+<tr><td><code class="a">"max_tokens"</code></td><td><code class="a">max_tokens</code> に達して途中で切れた</td><td>ツールは<strong>実行しない</strong>。上限を上げて再試行</td></tr>
+<tr><td><code class="a">"stop_sequence"</code></td><td>指定した停止文字列に当たった</td><td>用途次第</td></tr>
+<tr><td><code class="a">"pause_turn"</code></td><td>サーバー側ツールの内部ループが上限（既定10回）に達した</td><td>そのまま再送すると続きから再開。「続けて」を足さない</td></tr>
+<tr><td><code class="a">"refusal"</code></td><td>安全上の理由で拒否した</td><td>ツールを実行しない。<code class="a">stop_details.category</code> に分類</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure>
+<div class="scroll">
+<svg class="diagram" viewBox="0 0 980 320" role="img" aria-label="stop_reason による分岐のフローチャート">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+  <rect x="12" y="116" width="150" height="46" rx="8" fill="var(--theirs-bg)" stroke="var(--theirs)" stroke-width="1.5"/>
+  <text x="87" y="138" text-anchor="middle" class="t-lab" fill="var(--fg)">② res が返る</text>
+  <text x="87" y="154" text-anchor="middle" class="t-mono" fill="var(--muted)">stop_reason を見る</text>
+  <line x1="162" y1="139" x2="206" y2="139" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ar)"/>
+
+  <rect x="210" y="14" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--line)"/>
+  <text x="310" y="32" text-anchor="middle" class="t-mono" fill="var(--theirs)">"tool_use"</text>
+  <text x="310" y="49" text-anchor="middle" class="t-lab" fill="var(--fg)">ツールを実行 → 続行</text>
+
+  <rect x="210" y="70" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--line)"/>
+  <text x="310" y="88" text-anchor="middle" class="t-mono" fill="var(--theirs)">"end_turn"</text>
+  <text x="310" y="105" text-anchor="middle" class="t-lab" fill="var(--fg)">break（正常終了）</text>
+
+  <rect x="210" y="126" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--line)"/>
+  <text x="310" y="144" text-anchor="middle" class="t-mono" fill="var(--theirs)">"max_tokens"</text>
+  <text x="310" y="161" text-anchor="middle" class="t-lab" fill="var(--fg)">実行せず上限を上げて再試行</text>
+
+  <rect x="210" y="182" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--line)"/>
+  <text x="310" y="200" text-anchor="middle" class="t-mono" fill="var(--theirs)">"pause_turn"</text>
+  <text x="310" y="217" text-anchor="middle" class="t-lab" fill="var(--fg)">そのまま再送して再開</text>
+
+  <rect x="210" y="238" width="200" height="40" rx="8" fill="var(--card)" stroke="var(--line)"/>
+  <text x="310" y="255" text-anchor="middle" class="t-mono" fill="var(--theirs)">"refusal"</text>
+  <text x="310" y="271" text-anchor="middle" class="t-lab" fill="var(--fg)">実行せず終了</text>
+
+  <line x1="410" y1="36" x2="470" y2="36" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="474" y="14" width="230" height="44" rx="8" fill="var(--mine-bg)" stroke="var(--mine)" stroke-width="1.5"/>
+  <text x="589" y="32" text-anchor="middle" class="t-lab" fill="var(--fg)">④⑤ 自分の関数を実行</text>
+  <text x="589" y="49" text-anchor="middle" class="t-mono" fill="var(--muted)">tool_result を作る</text>
+  <line x1="704" y1="36" x2="764" y2="36" stroke="var(--muted)" stroke-width="1.6" marker-end="url(#ar)"/>
+  <rect x="768" y="14" width="200" height="44" rx="8" fill="var(--theirs-bg)" stroke="var(--theirs)" stroke-width="1.5"/>
+  <text x="868" y="32" text-anchor="middle" class="t-lab" fill="var(--fg)">⑥① もう一度 create()</text>
+  <text x="868" y="49" text-anchor="middle" class="t-mono" fill="var(--muted)">role: "user" で返す</text>
+  <path d="M868,58 V300 H87 V166" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+  <text x="500" y="294" text-anchor="middle" class="t-mono" fill="var(--muted)">ループ（上限つき。while True は書かない）</text>
+</svg>
+</div>
+<figcaption>ループを1周させるかどうかは <code>stop_reason</code> だけで決まる。上限（<code>MAX_TURNS</code>）を必ず置く ─ 上限がないと <code>tool_use</code> が返り続ける限り回り、毎周課金される。</figcaption>
+</figure>
+
+<div class="two">
+  <div class="box ok"><h3><span class="tag ok">正</span>ループ終了の判定</h3>
+<pre><code>if res.<span class="a">stop_reason</span> != <span class="a">"tool_use"</span>:
+    break</code></pre>
+  <p style="font-size:13.5px;margin:4px 0 0">状態を示す値で判定している。</p></div>
+  <div class="box ng"><h3><span class="tag ng">誤</span>本文テキストで判定</h3>
+<pre><code>if "完了しました" in res.content[0].text:
+    break</code></pre>
+  <p style="font-size:13.5px;margin:4px 0 0">言い回しは確率的に変わる。選択肢として出たら誤り。</p></div>
+</div>
+
+<!-- 02 -->
+<h2 id="s2"><span class="n">02</span>リクエストの固定パラメータ</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>パラメータ</th><th>必須</th><th>中身</th></tr></thead>
+<tbody>
+<tr><td><code class="a">model</code></td><td>必須</td><td>モデル ID の文字列（値も Anthropic が決めている）</td></tr>
+<tr><td><code class="a">max_tokens</code></td><td>必須</td><td>1応答の出力上限。超えると <code class="a">stop_reason: "max_tokens"</code></td></tr>
+<tr><td><code class="a">messages</code></td><td>必須</td><td>会話履歴の配列。<code class="a">role</code> は <code class="a">"user"</code> / <code class="a">"assistant"</code></td></tr>
+<tr><td><code class="a">system</code></td><td>任意</td><td>システムプロンプト。<strong><code>messages</code> の中ではなくトップレベル</strong></td></tr>
+<tr><td><code class="a">tools</code></td><td>任意</td><td>ツール定義の配列</td></tr>
+<tr><td><code class="a">tool_choice</code></td><td>任意</td><td>ツールの使わせ方（→ 05）</td></tr>
+<tr><td><code class="a">stop_sequences</code></td><td>任意</td><td>これが出たら止める文字列</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note api"><p><strong>ステートレス。</strong>API は前回のやりとりを覚えていない。毎回 <code class="a">messages</code> に履歴を全部載せて送る。だから周回ごとに入力トークンが増える（コンテキスト管理が別ドメインで問われる理由）。</p></div>
+
+<h3>レスポンスの固定フィールド</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>フィールド</th><th>中身</th></tr></thead>
+<tbody>
+<tr><td><code class="a">id</code></td><td><code class="v">msg_…</code></td></tr>
+<tr><td><code class="a">type</code></td><td><code class="a">"message"</code></td></tr>
+<tr><td><code class="a">role</code></td><td><code class="a">"assistant"</code>（レスポンスは常にこれ）</td></tr>
+<tr><td><code class="a">content</code></td><td>ブロックの配列（→ 03）</td></tr>
+<tr><td><code class="a">stop_reason</code></td><td>→ 01</td></tr>
+<tr><td><code class="a">stop_details</code></td><td><code class="a">"refusal"</code> のときだけ入る。他は <code>null</code></td></tr>
+<tr><td><code class="a">usage</code></td><td><code class="a">input_tokens</code> / <code class="a">output_tokens</code> / <code class="a">cache_creation_input_tokens</code> / <code class="a">cache_read_input_tokens</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 03 -->
+<h2 id="s3"><span class="n">03</span>content ブロックの種類</h2>
+<p><code class="a">content</code> は文字列ではなく<strong>ブロックの配列</strong>。各ブロックの <code class="a">type</code> で処理を振り分ける。</p>
+<div class="tbl">
+<table>
+<thead><tr><th>type</th><th>向き</th><th>主なフィールド</th></tr></thead>
+<tbody>
+<tr><td><code class="a">"text"</code></td><td>両方</td><td><code class="a">text</code></td></tr>
+<tr><td><code class="a">"tool_use"</code></td><td>Claude → 自分</td><td><code class="a">id</code> / <code class="a">name</code> / <code class="a">input</code></td></tr>
+<tr><td><code class="a">"tool_result"</code></td><td>自分 → Claude</td><td><code class="a">tool_use_id</code> / <code class="a">content</code> / <code class="a">is_error</code></td></tr>
+<tr><td><code class="a">"thinking"</code></td><td>Claude → 自分</td><td>拡張思考の出力。次の周にそのまま返す</td></tr>
+<tr><td><code class="a">"image"</code> / <code class="a">"document"</code></td><td>自分 → Claude</td><td><code class="a">source</code>（<code class="a">base64</code> / <code class="a">file</code>）</td></tr>
+<tr><td><code class="a">"server_tool_use"</code></td><td>Claude → 自分</td><td>サーバー側ツールの呼び出し記録（自分は実行しない）</td></tr>
+<tr><td><code class="a">"web_search_tool_result"</code> など</td><td>Claude → 自分</td><td>サーバー側ツールの結果。<strong>最初から入っている</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 04 -->
+<h2 id="s4"><span class="n">04</span>ツール定義（自作ツール）</h2>
+<pre><code>{
+  <span class="a">"name"</span>: <span class="m">"get_customer"</span>,
+  <span class="a">"description"</span>: <span class="m">"顧客を本人確認する。email を渡すと一意に確定できる。"</span>,
+  <span class="a">"input_schema"</span>: {
+    <span class="a">"type"</span>: <span class="a">"object"</span>,
+    <span class="a">"properties"</span>: { <span class="m">"email"</span>: {<span class="a">"type"</span>: <span class="a">"string"</span>} },
+    <span class="a">"required"</span>: [<span class="m">"email"</span>]
+  }
+}</code></pre>
+<div class="tbl">
+<table>
+<thead><tr><th>キー</th><th>固定/自由</th><th>ポイント</th></tr></thead>
+<tbody>
+<tr><td><code class="a">name</code></td><td>キーは固定・値は自分</td><td><code class="a">tool_use.name</code> としてそのまま返ってくる</td></tr>
+<tr><td><code class="a">description</code></td><td>キーは固定・値は自分</td><td><strong>ツール選択の主要な機構</strong>。「何をするか」より「<strong>いつ呼ぶか</strong>」を書く</td></tr>
+<tr><td><code class="a">input_schema</code></td><td>キーは固定・中身は JSON Schema</td><td><code class="a">type</code> / <code class="a">properties</code> / <code class="a">required</code> / <code class="a">enum</code></td></tr>
+<tr><td><code class="a">strict</code></td><td>固定（任意）</td><td><code>true</code> で引数がスキーマに必ず適合する</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note"><p><strong>選択の精度を上げる順序。</strong>①<code class="a">description</code> に呼ぶ条件を書く → ②引数を減らす・<code class="a">enum</code> で狭める → ③そもそも危ない引数を消す。これでも確率は 100% にならないので、金銭や削除が絡むなら<strong>コード側で止める</strong>（→ 07）。</p></div>
+
+<!-- 05 -->
+<h2 id="s5"><span class="n">05</span><code>tool_choice</code></h2>
+<div class="tbl">
+<table>
+<thead><tr><th>値</th><th>挙動</th><th>使いどころ</th></tr></thead>
+<tbody>
+<tr><td><code class="a">{"type": "auto"}</code></td><td>使うかどうかも Claude が決める（既定）</td><td>通常のエージェント</td></tr>
+<tr><td><code class="a">{"type": "any"}</code></td><td>必ず1つ以上使わせる</td><td>必ず構造化して返させたいとき</td></tr>
+<tr><td><code class="a">{"type": "tool", "name": …}</code></td><td>指定したツールを使わせる</td><td>用途が1つに決まっているとき</td></tr>
+<tr><td><code class="a">{"type": "none"}</code></td><td>使わせない</td><td>要約だけさせたいとき</td></tr>
+</tbody>
+</table>
+</div>
+<p><code class="a">"disable_parallel_tool_use": true</code> を添えると、1応答あたり1件までに制限できる。既定では<strong>1応答に複数の <code class="a">tool_use</code> が入りうる</strong>。</p>
+
+<!-- 06 -->
+<h2 id="s6"><span class="n">06</span>ツールの3分類</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>分類</th><th>定義するのは</th><th>実行するのは</th><th>例</th></tr></thead>
+<tbody>
+<tr><td><strong>user-defined tools</strong><br>（自作ツール）</td><td>自分</td><td>自分のコード</td><td><code class="m">get_customer</code> <code class="m">process_refund</code></td></tr>
+<tr><td><strong>Anthropic-defined tools</strong></td><td>Anthropic</td><td><strong>自分のコード</strong></td><td><code class="a">bash</code> <code class="a">text_editor</code> <code class="a">memory</code> <code class="a">computer</code></td></tr>
+<tr><td><strong>server tools</strong></td><td>Anthropic</td><td>Anthropic のサーバー</td><td><code class="a">web_search</code> <code class="a">web_fetch</code> <code class="a">code_execution</code></td></tr>
+</tbody>
+</table>
+</div>
+<p>上2つをまとめて <strong>client tools</strong>（自分の環境で実行するツール）と呼ぶ。「実行するのは誰か」で分かれる点が問われる。</p>
+
+<h3>Anthropic 定義ツールの宣言 ─ <code>type</code> と <code>name</code> だけ</h3>
+<div class="two">
+  <div class="box"><h3>自作ツール</h3>
+<pre><code>{<span class="a">"name"</span>: <span class="m">"get_customer"</span>,
+ <span class="a">"description"</span>: <span class="m">"..."</span>,
+ <span class="a">"input_schema"</span>: {...}}</code></pre>
+  <p style="font-size:13.5px">引数の形は自分が教える。</p></div>
+  <div class="box"><h3>Anthropic 定義ツール</h3>
+<pre><code>{<span class="a">"type"</span>: <span class="a">"bash_20250124"</span>,
+ <span class="a">"name"</span>: <span class="a">"bash"</span>}
+
+{<span class="a">"type"</span>: <span class="a">"text_editor_20250728"</span>,
+ <span class="a">"name"</span>: <span class="a">"str_replace_based_edit_tool"</span>}</code></pre>
+  <p style="font-size:13.5px"><strong><code class="a">input_schema</code> を書かない。</strong>引数の形はモデルに組み込み済み。</p></div>
+</div>
+<ul>
+<li><strong><code class="a">type</code> の日付は組み込みスキーマのバージョン</strong>。<code class="a">bash_20250124</code> は「2025-01-24 版の bash ツール仕様」。仕様が更新されると新しい日付の型が増える。</li>
+<li>Claude が返す <code class="a">input</code> は決まった形（bash なら <code class="a">{"command": "…"}</code> か <code class="a">{"restart": true}</code>）。</li>
+<li><strong>同じ名前で自作しても別物。</strong><code>{"name": "bash", "input_schema": …}</code> と書けば、ただの自作ツールになり組み込みの挙動は付かない。</li>
+<li><strong>実行するのは自分のコード。</strong>Claude はコマンド文字列を返すだけなので、隔離環境・許可リスト・タイムアウトは自分の責任。</li>
+</ul>
+<div class="note api"><p><strong>server tools は実行も結果もサーバー側。</strong><code class="a">tools</code> に入れて有効にするだけでよく、<code class="a">tool_result</code> を返す必要がない。結果は最初からレスポンスに入っている。内部ループが上限に達すると <code class="a">stop_reason: "pause_turn"</code> になる。</p></div>
+
+<!-- 07 -->
+<h2 id="s7"><span class="n">07</span>往復の規則と落とし穴</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>規則</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td><code class="a">tool_result</code> は <code class="a">role: "user"</code> のメッセージで返す</td><td><code>"tool"</code> というロールは存在しない</td></tr>
+<tr><td><code class="a">tool_use_id</code> に <code class="a">tool_use.id</code> をそのまま入れる</td><td>どの依頼への答えかを対応付けるため</td></tr>
+<tr><td>並列の <code class="a">tool_use</code> は、<strong>全部の結果を1つの user メッセージ</strong>にまとめる</td><td>分割して送ると、Claude が並列呼び出しをしなくなる</td></tr>
+<tr><td>失敗したツールも省略せず <code class="a">is_error: true</code> で返す</td><td>返さないと対応関係が崩れる。Claude は誤りを認識して別の手を試せる</td></tr>
+<tr><td>履歴には <code class="a">res.content</code> を<strong>丸ごと</strong>積む</td><td>テキストだけ抜くと <code class="a">tool_use</code> が消え、次の <code class="a">tool_result</code> が対応先を失う</td></tr>
+<tr><td><code class="a">content</code> は<strong>文字列</strong></td><td>dict は JSON 文字列にしてから入れる</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note warn"><p><strong>ドメイン1の中心命題。</strong>プロンプトや Few-shot は<strong>確率的</strong>にしか効かない。金銭・削除・認可のように誤りが取り返しのつかない処理は、<strong>コード側の前提条件（programmatic enforcement）で決定論的に止める</strong>。公式の表現は “deterministic guarantees that prompt-based approaches cannot”。</p></div>
+<div class="two">
+  <div class="box ng"><h3><span class="tag ng">確率的</span>効くが 0 にはならない</h3>
+  <ul style="margin:4px 0 0;padding-left:1.2em"><li>システムプロンプトで強く指示する</li><li>Few-shot で正しい順序を見せる</li><li><code class="a">description</code> を改善する</li></ul></div>
+  <div class="box ok"><h3><span class="tag ok">決定論的</span>実行そのものを止める</h3>
+  <ul style="margin:4px 0 0;padding-left:1.2em"><li>ツール実行前の条件チェック（前提条件）</li><li>hooks（<code class="a">PreToolUse</code> で拒否）</li><li>ツール自体を渡さない・引数を消す</li></ul></div>
+</div>
+
+<!-- 08 -->
+<h2 id="s8"><span class="n">08</span>オーケストレーションの用語</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>用語</th><th>意味</th><th>問われ方</th></tr></thead>
+<tbody>
+<tr><td><strong>coordinator–subagent</strong><br>（コーディネーター／サブエージェント）</td><td>親がタスクを分割し、子が個別に担当する構成</td><td>1体＝1タスク。子は専用の狭いツールだけ持つ</td></tr>
+<tr><td><strong>explicit context passing</strong><br>（明示的なコンテキスト受け渡し）</td><td>子に必要な情報を明示的に渡す</td><td>子は親の会話を<strong>自動では引き継がない</strong></td></tr>
+<tr><td><strong>parallel execution</strong></td><td>独立したタスクの同時実行</td><td>依存関係があるものは並列にしない</td></tr>
+<tr><td><strong>session forking</strong>（<code>fork_session</code>）</td><td>会話を分岐させ、別コンテキストで進める</td><td>本流を汚さずに試す／独立検証</td></tr>
+<tr><td><strong>hooks</strong></td><td>特定の時点で自分のコードを差し込む仕組み</td><td><strong>決定論的な強制</strong>の手段として出る</td></tr>
+<tr><td><strong>loop termination conditions</strong></td><td>ループの終了条件</td><td><code class="a">stop_reason</code> ＋ ターン上限</td></tr>
+<tr><td><strong>context isolation</strong></td><td>文脈を分ける</td><td>汚染や迎合バイアスを避ける</td></tr>
+</tbody>
+</table>
+</div>
+<h3>hooks の主なイベント（Claude Code 側）</h3>
+<p><code class="a">PreToolUse</code>（実行前・ここで<strong>拒否できる</strong>） / <code class="a">PostToolUse</code>（実行後） / <code class="a">UserPromptSubmit</code> / <code class="a">Stop</code> / <code class="a">SubagentStop</code> / <code class="a">SessionStart</code> / <code class="a">SessionEnd</code> / <code class="a">PreCompact</code> / <code class="a">Notification</code></p>
+
+<!-- 09 -->
+<h2 id="s9"><span class="n">09</span>隣接するコンテキスト管理の用語</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>用語</th><th>何をするか</th><th>混同しやすい点</th></tr></thead>
+<tbody>
+<tr><td><strong>prompt caching</strong></td><td>変わらない前置きを再利用して入力コストを下げる</td><td>前方一致。1バイトでも変わると以降が無効。<code class="a">tools</code> → <code class="a">system</code> → <code class="a">messages</code> の順で評価</td></tr>
+<tr><td><strong>context editing</strong></td><td>古いツール結果などを<strong>消す</strong></td><td>要約ではない</td></tr>
+<tr><td><strong>compaction</strong></td><td>古い履歴を<strong>要約</strong>して圧縮する</td><td>消すのではない</td></tr>
+<tr><td><strong>memory tool</strong></td><td>会話をまたいでファイルに残す</td><td>client tool。保存先は自分が用意する</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 10 -->
+<h2 id="s10"><span class="n">10</span>頻出のひっかけ</h2>
+
+<details class="qa"><summary>ループの終了は、Claude の返答に「完了」と書かれているかで判定する？</summary>
+<div class="ans"><p><strong>誤り。</strong><code class="a">stop_reason</code> で判定する。文面は確率的に変わる。</p></div></details>
+
+<details class="qa"><summary><code>tool_result</code> は <code>role: "tool"</code> で返す？</summary>
+<div class="ans"><p><strong>誤り。</strong><code class="a">role: "user"</code> のメッセージに <code class="a">tool_result</code> ブロックとして入れる。</p></div></details>
+
+<details class="qa"><summary>並列で3件呼ばれたら、結果を3通のメッセージに分けて送る？</summary>
+<div class="ans"><p><strong>誤り。</strong>1通の user メッセージに3つの <code class="a">tool_result</code> を入れる。分けると並列呼び出しをしなくなる。</p></div></details>
+
+<details class="qa"><summary>ツールが失敗したら、その結果は送らずに次へ進む？</summary>
+<div class="ans"><p><strong>誤り。</strong><code class="a">is_error: true</code> を付けて必ず返す。返さないと <code class="a">tool_use</code> と対応が取れない。</p></div></details>
+
+<details class="qa"><summary>本人確認を必ず先に行わせたい。最も効果的なのはシステムプロンプトでの指示？</summary>
+<div class="ans"><p><strong>誤り。</strong>プロンプトは確率的。<strong>実行前にコードで条件を検査してブロックする</strong>（programmatic enforcement）が正解。公式サンプル問題1の論点。</p></div></details>
+
+<details class="qa"><summary>Claude がツールを呼ぶので、DB の更新は Claude が行っている？</summary>
+<div class="ans"><p><strong>誤り。</strong>Claude は「このツールをこの引数で呼んでほしい」というデータを返すだけ。実行するのは自分のコード。server tools だけが例外で、実行が Anthropic 側で完結する。</p></div></details>
+
+<details class="qa"><summary>会話の履歴は API 側が覚えているので、増分だけ送ればよい？</summary>
+<div class="ans"><p><strong>誤り。</strong>ステートレスなので毎回すべて送る。だからトークンが周回ごとに増える。</p></div></details>
+
+<details class="qa"><summary>サブエージェントは親の会話履歴を自動で引き継ぐ？</summary>
+<div class="ans"><p><strong>誤り。</strong>必要な情報は明示的に渡す（explicit context passing）。引き継がないからこそ文脈を分離できる。</p></div></details>
+
+<details class="qa"><summary><code>bash</code> ツールは Anthropic 定義なので、実行もサーバー側で行われる？</summary>
+<div class="ans"><p><strong>誤り。</strong>定義は Anthropic、<strong>実行は自分のコード</strong>（client tool）。サーバー側で実行されるのは <code class="a">web_search</code> などの server tools。</p></div></details>
+
+<details class="qa"><summary><code>MAX_TURNS</code> のような上限がなくても、<code>end_turn</code> が来れば必ず止まる？</summary>
+<div class="ans"><p><strong>危険。</strong>ツール結果を見て再びツールを呼び続ける状況では終わらない。ターン上限は必ず置く。</p></div></details>
+
+<!-- 11 -->
+<h2 id="s11"><span class="n">11</span>英日対照（選択肢は英語原文が元）</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>英語</th><th>日本語</th></tr></thead>
+<tbody>
+<tr><td>agentic loop</td><td>エージェントループ（渡す→返る→呼ぶ→渡す の繰り返し）</td></tr>
+<tr><td>loop termination condition</td><td>ループの終了条件</td></tr>
+<tr><td>control flow based on <code>stop_reason</code></td><td><code>stop_reason</code> に基づく制御フロー</td></tr>
+<tr><td>programmatic enforcement / precondition</td><td>プログラム的な強制・前提条件</td></tr>
+<tr><td>deterministic guarantee</td><td>決定論的な保証</td></tr>
+<tr><td>probabilistic compliance</td><td>確率的な遵守（プロンプト頼み）</td></tr>
+<tr><td>client tools / server tools</td><td>自分の環境で実行 / Anthropic 側で実行</td></tr>
+<tr><td>user-defined / Anthropic-defined tools</td><td>自作ツール / Anthropic 定義ツール</td></tr>
+<tr><td>parallel tool use</td><td>並列ツール呼び出し</td></tr>
+<tr><td>coordinator–subagent</td><td>コーディネーターとサブエージェント</td></tr>
+<tr><td>explicit context passing</td><td>明示的なコンテキスト受け渡し</td></tr>
+<tr><td>session forking</td><td>セッションのフォーク</td></tr>
+<tr><td>stateless</td><td>ステートレス（毎回履歴を全部送る）</td></tr>
+<tr><td>escalation</td><td>人間への引き継ぎ</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>
+対応する実装: <code>labs/scenario1-no-mcp/agent.py</code>（<code>stop_reason</code> の分岐 L94 / <code>tool_use</code> の取り出し L97-103 / A 関門 L107-118 / <code>tool_result</code> L136-140）。
+関連: <a href="04_trace-replay.html">04 やりとり再生</a> / <a href="03_scenario1-code-map.html">03 コード地図</a> / <a href="02_scenario1.html">02 シナリオ1の解剖</a> / <a href="01_agent-overview.html">01 エージェントの全体像</a>
+</footer>
+</div>
