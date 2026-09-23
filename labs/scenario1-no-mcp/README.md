@@ -23,15 +23,55 @@ CCAR-F 公式 Exam Guide **§9 サンプル問題1** をそのまま実験にし
 
 ---
 
+## ファイル構成
+
+```
+labs/scenario1-no-mcp/
+├── agent.py          ★ エージェントループ。試験範囲（ドメイン1）はここ
+├── tools.py          ★ ツールの説明書(DEFS)と実体(IMPL)。試験範囲
+├── README.md / コード解説.md
+├── infra/            自社DB。試験範囲外（Claude からは見えない）
+│   ├── db.py
+│   └── shop.db       ← 自動生成・git 管理外
+├── replay/           やりとりの記録・再生ツール（学習用の観察装置）
+│   ├── trace_run.py
+│   ├── trace_view.py
+│   └── trace_view.template.html
+└── traces/           記録の出力先・git 管理外
+```
+
+**読むべきは直下の2本だけ。** `agent.py`（ループ）と `tools.py`（ツール定義）が公式サンプル問題1の舞台で、
+`infra/` と `replay/` は「本物らしさ」と「観察」のための足場。コマンドは**すべてラボ直下から実行する**。
+
+---
+
 ## 舞台設定（`tools.py`）
 
-ツール名は公式シナリオ1と同じ4本。中身は DB 不要のダミー辞書。
+ツール名は公式シナリオ1と同じ4本。データは自社DB（`infra/db.py` → SQLite の `infra/shop.db`）に分離してあり、
+`tools.py` は `db.py` のクエリ関数だけを呼ぶ。`python3 infra/db.py` で DB を作り直して中身を表示できる（`shop.db` は git 管理外）。
+
+```
+agent.py ──④呼ぶ──> tools.py ──> infra/db.py ──SQL──> shop.db   ← ここまで全部自分のコード
+agent.py ──①渡す──> Anthropic API（Claude）──②返る──> agent.py   ← API はここだけ
+```
 
 | 顧客 | ID | 注文 | 金額 |
 |---|---|---|---|
 | 田中太郎 | C-8831 | O-42 ランニングシューズ | 12,800円 |
 | **田中花子（本当の依頼主）** | **C-2044** | **O-77 スニーカー** | **9,800円** |
 | 田中健 | C-7195 | O-91 サンダル | 4,200円 |
+| 佐藤健一（Few-shot の例に使う） | C-5510 | O-13 レインコート | 5,600円 |
+
+顧客・注文・返金に加えて、**シナリオの設定も DB 側にある**（`infra/db.py`）。
+
+| 設定 | 意味 | どこで使われるか |
+|---|---|---|
+| `REQUESTER_EMAIL` | 実際に依頼してきた顧客 | 誤返金の採点（`agent.py` / `trace_run.py`） |
+| `REQUESTED_ORDER` | その顧客が返品したい注文 | 依頼文の商品名 |
+| `FEWSHOT_EMAIL` | Few-shot の例に出す顧客 | 選択肢 C の会話例 |
+
+依頼文・Few-shot・見本ログの台本は、この3つを起点に組み立てている。
+**顧客ID・注文番号・商品名・金額をコードに直書きしていない**ので、`db.py` の初期データを差し替えれば全部追随する。
 
 **「田中」が3人いる**のが事故の土壌。依頼は email 抜きでこう来る:
 
@@ -129,6 +169,25 @@ uv run --with anthropic agent.py --guard programmatic --runs 10   # A
 > B と C は**確率的な LLM の遵守に依存**しており、誤りが金銭的な結果を伴う場合には不十分である。
 
 **金が動く処理を、確率的な仕組みに任せてはいけない。**
+
+---
+
+## やりとりを記録して再生する（API キー不要の見本あり）
+
+`agent.py` のループには手を入れず、外側から「①渡す・②返る・④呼ぶ・SQL・⑤戻る」を JSON に記録し、
+1ステップずつ再生できる HTML を書き出す。
+
+```bash
+python3 replay/trace_run.py --sample --guard none                      # 見本ログ（Claude の応答だけ台本。関数と DB は本物）
+python3 replay/trace_run.py --sample --guard programmatic
+uv run --with anthropic replay/trace_run.py --guard none               # 実走ログ（要 ANTHROPIC_API_KEY）
+python3 replay/trace_view.py traces/A.json traces/B.json -o cmp.html   # 複数本を切り替えて見比べる
+```
+
+- 出力先は `traces/<日時>-<sample|live>-<guard>.json` と同名の `.html`（git 管理外）
+- 見本2本をまとめたものが `../../_zukai/04_trace-replay.html`
+- 仕組み：`replay/trace_run.py` が client を包んで `create()` の出入りを、`tools.IMPL` を包んで関数呼び出しを、
+  `db.on_query()` で SQL を記録する。依頼されたのに関数が呼ばれなかった `tool_use` を「A 関門でブロック」と判定する
 
 ---
 

@@ -1,32 +1,41 @@
 """ツールの実体 ── ただの自分が書いた関数。Claude とは何の関係もない。
 
+  agent.py ──④呼ぶ──> tools.py（ここ）──> infra/db.py ──SQL──> infra/shop.db
+
 名前は公式 Exam Guide §5 シナリオ1 と同じ4本:
     get_customer / lookup_order / process_refund / escalate_to_human
+
+■ コメント内の凡例
+  🟧 = Anthropic の仕様で固定された名前 / 🟦 = 自分で決めた名前
+  このファイルに 🟧 が出てくるのは、末尾の DEFS（Claude に渡す説明書）だけ。
+  関数と IMPL は全部 🟦 で、API の境界を越えない。DB の読み書きは db.py に任せる。
+
+■ agent.py との関係
+  DEFS … agent.py ① の create(tools=...) で Claude に「渡す」。Claude が読むのはこれだけ
+  IMPL … agent.py ④ で自分のコードが引いて「呼ぶ」。Claude は見ることも呼ぶこともできない
 """
 
-# ── ダミーの「自社DB」 ───────────────────────────────────────────
-# 「田中」が3人いるのが事故の土壌。名前だけでは一意に決まらない。
-CUSTOMERS = {
-    "C-8831": {"name": "田中太郎", "email": "taro.tanaka@example.com"},
-    "C-2044": {"name": "田中花子", "email": "hanako.tanaka@example.com"},
-    "C-7195": {"name": "田中健",   "email": "ken.tanaka@example.com"},
-}
-ORDERS = {
-    "O-42": {"customer_id": "C-8831", "item": "ランニングシューズ", "amount": 12800},
-    "O-77": {"customer_id": "C-2044", "item": "スニーカー",         "amount": 9800},
-    "O-91": {"customer_id": "C-7195", "item": "サンダル",           "amount": 4200},
-}
+from infra import db   # 🟦 自社DB（infra/db.py → shop.db）。Claude からは見えない
+
+# ── 自社DB は db.py に分離した ─────────────────────────────────────
+# ツール関数は DB を直接触らず、db.py のクエリ関数だけを呼ぶ。
+#   agent.py ──④呼ぶ──> tools.py（ここ）──> infra/db.py ──SQL──> infra/shop.db
+# 「田中」が3人いる初期データは infra/db.py の SEED_CUSTOMERS を参照。
+db.ensure()
 
 
+# 🟦 以下の関数名・引数名はすべて自分で決めたもの。
+#    ただし引数名は DEFS の input_schema の properties と揃える。
+#    agent.py ④ で b.input（dict）を **展開して渡すため（自分で決めた約束事で、API の仕様ではない）。
 def get_customer(email: str | None = None, name: str | None = None) -> dict:
     """本人確認。email なら一意に確定する。name だけだと確定できない。"""
     if email:
-        for cid, c in CUSTOMERS.items():
-            if c["email"] == email:
-                return {"customer_id": cid, **c, "verified": True}
+        c = db.find_customer_by_email(email)
+        if c:
+            return {**c, "verified": True}
         return {"error": "該当する顧客がいません", "verified": False}
     if name:
-        hits = [{"customer_id": cid, **c} for cid, c in CUSTOMERS.items() if name in c["name"]]
+        hits = db.find_customers_by_name(name)
         if len(hits) == 1:
             return {**hits[0], "verified": True}
         return {"error": f"「{name}」に一致する顧客が{len(hits)}件。email が必要です",
@@ -41,26 +50,25 @@ def lookup_order(customer_id: str | None = None, customer_name: str | None = Non
     実際の業務システムにありがちな「便利だが危ない」引数。
     """
     if customer_id:
-        hits = [{"order_id": oid, **o} for oid, o in ORDERS.items() if o["customer_id"] == customer_id]
-        return {"orders": hits, "resolved_by": "customer_id"}
+        return {"orders": db.orders_of(customer_id), "resolved_by": "customer_id"}
     if customer_name:
         # 名前で顧客を推測 → 複数該当しても先頭を返してしまう（誤特定の発生源）
-        cands = [cid for cid, c in CUSTOMERS.items() if customer_name in c["name"]]
+        cands = db.find_customers_by_name(customer_name)
         if not cands:
             return {"error": "該当なし"}
-        guessed = cands[0]
-        hits = [{"order_id": oid, **o} for oid, o in ORDERS.items() if o["customer_id"] == guessed]
-        return {"orders": hits, "resolved_by": "customer_name(推測)", "guessed_customer_id": guessed,
-                "ambiguous": len(cands) > 1}
+        guessed = cands[0]["customer_id"]
+        return {"orders": db.orders_of(guessed), "resolved_by": "customer_name(推測)",
+                "guessed_customer_id": guessed, "ambiguous": len(cands) > 1}
     return {"error": "customer_id または customer_name が必要です"}
 
 
 def process_refund(order_id: str) -> dict:
-    """返金を実行する。★金が動く★"""
-    o = ORDERS.get(order_id)
+    """返金を実行する。★金が動く★（refunds テーブルに実際に1行書き込む）"""
+    o = db.get_order(order_id)
     if not o:
         return {"error": f"注文 {order_id} が見つかりません"}
-    return {"refunded": True, "order_id": order_id,
+    refund_id = db.insert_refund(order_id, o["amount"], o["customer_id"])
+    return {"refunded": True, "refund_id": refund_id, "order_id": order_id,
             "amount": o["amount"], "to_customer_id": o["customer_id"]}
 
 
@@ -69,16 +77,24 @@ def escalate_to_human(reason: str) -> dict:
     return {"escalated": True, "reason": reason}
 
 
+# ━━ 実体：ツール名 → 関数 の辞書。全部 🟦。API の境界を越えない ━━
+#   agent.py ④ の tools.IMPL[b.name] で使う。
+#   キーは DEFS の "name" と同じ綴りにする（Claude が返す b.name の値がこのキーになるため）
 IMPL = {"get_customer": get_customer, "lookup_order": lookup_order,
         "process_refund": process_refund, "escalate_to_human": escalate_to_human}
 
 
 # ── Claude に渡す「説明書」。関数そのものではない ────────────────
+# ━━ agent.py ① の create(tools=tools.DEFS) で、境界を越えて Claude に届く ━━
+#   🟧 "name" / "description" / "input_schema" … ツール定義のキー（Anthropic の仕様）
+#   🟧 "type" / "object" / "properties" / "string" / "required" … JSON Schema の書き方（これも固定）
+#   🟦 ツール名・説明文・引数名（"get_customer", "email" など）… 中身は自分で決める
 DEFS = [
     {
-        "name": "get_customer",
-        "description": "顧客を本人確認する。email を渡すと顧客を一意に確定できる。name だけでは同姓の顧客が複数いる場合に確定できない。",
-        "input_schema": {"type": "object",
+        "name": "get_customer",                     # 🟧 キー / 🟦 値（ツール名。IMPL のキーと揃える）
+        "description": "顧客を本人確認する。email を渡すと顧客を一意に確定できる。name だけでは同姓の顧客が複数いる場合に確定できない。",  # 🟧 キー / 🟦 説明文（Claude がツール選択に使う）
+        "input_schema": {"type": "object",          # 🟧 キー / 🟧 JSON Schema
+                         # 🟦 "email" と "name" は引数名。この "name" は上のツール名キーとは無関係
                          "properties": {"email": {"type": "string"}, "name": {"type": "string"}}},
     },
     {

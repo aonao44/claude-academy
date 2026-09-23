@@ -21,3 +21,6 @@ PRIVATE.md
 .env.*
 .envrc
 !.env.example
+
+# labs の実行トレース（trace_run.py が毎回生成する）
+labs/*/traces/
