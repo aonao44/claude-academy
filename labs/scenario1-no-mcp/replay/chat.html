@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>見える化サポートチャット</title>
+<style>
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #dcdcd6;
+  --front: #2f6fdb; --back: #6a4fc2; --api: #d0711b; --db: #1f8a5b;
+  --bad: #c8322f; --badbg: #fde8e7; --ok: #1f8a5b; --hl: #fff6d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --panel: #1f1f1d; --ink: #ecece8; --muted: #9a9a93; --line: #3a3a36;
+    --front: #6b9cf0; --back: #a68ef0; --api: #f0a45b; --db: #5cc796;
+    --bad: #f07572; --badbg: #3a1f1e; --ok: #5cc796; --hl: #3a341c;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.55 -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+header { display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; padding: 6px 16px; white-space: nowrap; overflow-x: auto;
+  border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; }
+header h1 { font-size: 15px; margin: 0 8px 0 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); padding: 6px 10px; font: inherit; cursor: pointer; }
+.seg button.on { background: var(--ink); color: var(--panel); }
+button.plain { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 8px;
+  padding: 6px 10px; font: inherit; cursor: pointer; }
+label.tog { display: inline-flex; gap: 4px; align-items: center; color: var(--muted); cursor: pointer; }
+.meter { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+main { display: grid; grid-template-columns: 340px 1fr; height: calc(100vh - 44px); }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } }
+
+/* ── 左：お客さん画面 ── */
+#chat { display: flex; flex-direction: column; border-right: 1px solid var(--line); background: var(--panel); min-height: 360px; }
+#idform { display: none; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--hl); align-items: center; }
+#idform.on { display: flex; }
+#idform input { flex: 1; min-width: 0; font: inherit; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+#idform span { font-size: 12px; color: var(--muted); }
+#log { flex: 1; overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.bubble { max-width: 85%; padding: 8px 11px; border-radius: 12px; white-space: pre-wrap; }
+.bubble.me { align-self: flex-end; background: var(--front); color: #fff; border-bottom-right-radius: 3px; }
+.bubble.bot { align-self: flex-start; background: var(--bg); border: 1px solid var(--line); border-bottom-left-radius: 3px; }
+.bubble.sys { align-self: center; background: none; color: var(--muted); font-size: 12px; text-align: center; }
+#chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 12px 6px; }
+#chips button { font-size: 12px; }
+form { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line); }
+form textarea { flex: 1; resize: none; height: 56px; font: inherit; padding: 6px 8px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+form button { border: 0; background: var(--front); color: #fff; border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
+form button:disabled { opacity: .5; cursor: default; }
+
+/* ── 右：4レーン ── */
+#stage { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; overflow: hidden; }
+.lanes-head { display: grid; grid-template-columns: repeat(4, 1fr); }
+.lanes-head { background: var(--panel); border-bottom: 1px solid var(--line); }
+.lanes-head div { text-align: center; padding: 8px 4px 6px; font-weight: 600; font-size: 13px; }
+.lanes-head small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+#rows { overflow: auto; position: relative; padding-bottom: 24px;
+  background-image: linear-gradient(var(--line), var(--line)), linear-gradient(var(--line), var(--line)),
+                    linear-gradient(var(--line), var(--line)), linear-gradient(var(--line), var(--line));
+  background-size: 2px 100%; background-repeat: no-repeat;
+  background-position: 12.5% 0, 37.5% 0, 62.5% 0, 87.5% 0; }
+.row { min-height: 44px; padding: 3px 0; animation: pop .25s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(-4px); } }
+.turnsep { text-align: center; color: var(--muted); font-size: 11px; padding: 10px 0 2px; }
+.arrow { position: relative; cursor: pointer; padding: 2px 0 8px; border-radius: 6px; }
+.arrow:hover, .arrow.sel, .box:hover, .box.sel { background: var(--hl); }
+.arrow .lbl { font-size: 12px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.arrow .shaft { height: 2px; background: currentColor; position: relative; }
+.arrow.r .shaft::after, .arrow.l .shaft::before { content: ""; position: absolute; top: -5px;
+  border: 6px solid transparent; }
+.arrow.r .shaft::after { right: -2px; border-left: 9px solid currentColor; border-right: 0; }
+.arrow.l .shaft::before { left: -2px; border-right: 9px solid currentColor; border-left: 0; }
+.box { display: inline-block; position: relative; transform: translateX(-50%); max-width: 46%; cursor: pointer; border: 1.5px solid currentColor; border-radius: 8px;
+  padding: 4px 8px; font-size: 12px; background: var(--panel); text-align: center; }
+.box.bad { color: var(--bad); background: var(--badbg); font-weight: 600; }
+.why { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: -2px; }
+body.nowhy .why { display: none; }
+.c-front { color: var(--front); } .c-back { color: var(--back); } .c-api { color: var(--api); } .c-db { color: var(--db); }
+.badge { display: inline-block; padding: 0 6px; border-radius: 10px; font-size: 11px; border: 1px solid currentColor; margin-left: 4px; }
+.badge.bad { color: var(--bad); }
+
+/* ── 下：messages の並び ＋ 実 JSON ── */
+#detail { border-top: 1px solid var(--line); background: var(--panel); height: 32vh; min-height: 70px; display: flex; flex-direction: column; }
+#grip { position: relative; z-index: 3; height: 12px; margin-top: -6px; cursor: ns-resize; flex: none; display: flex; justify-content: center; align-items: center; touch-action: none; }
+#grip::before { content: ""; width: 44px; height: 4px; border-radius: 2px; background: var(--line); }
+#grip:hover::before, #grip.drag::before { background: var(--muted); }
+body.resizing { cursor: ns-resize; user-select: none; }
+#stack { padding: 8px 12px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center; font-size: 12px; border-bottom: 1px solid var(--line); }
+#stack .m { padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); }
+#stack .m.user { color: var(--front); } #stack .m.assistant { color: var(--api); }
+#json { margin: 0; padding: 10px 12px; overflow: auto; font: 12px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; word-break: break-all; }
+#jsonTitle { padding: 6px 12px 0; font-size: 12px; color: var(--muted); }
+#stepbar { display: none; padding: 6px 12px; gap: 8px; align-items: center; border-top: 1px solid var(--line); background: var(--hl); }
+#stepbar.on { display: flex; }
+</style>
+</head>
+<body>
+<header>
+  <h1>見える化サポートチャット</h1>
+  <div class="seg" id="guards"></div>
+  <button class="plain" id="reset">新しい会話</button>
+  <label class="tog" title="email で見つからないとき、実際に検索した値（searched_email）や再試行可否をエラーに入れて返す"><input type="checkbox" id="structured"> 構造化エラー</label>
+  <label class="tog" title="Claude が頼んだ email がお客さんの発言に無ければ、コードが実行を止める"><input type="checkbox" id="verify"> メール照合</label>
+  <label class="tog" title="email はチャットでなく入力欄で受け取り、コードが直接本人確認する。Claude には書き写させない"><input type="checkbox" id="form"> フォーム本人確認</label>
+  <label class="tog"><input type="checkbox" id="why" checked> 解説</label>
+  <label class="tog"><input type="checkbox" id="step"> 1本ずつ進める</label>
+  <span class="meter" id="meter">—</span>
+</header>
+<main>
+  <section id="chat">
+    <div id="idform"><span>本人確認</span><input id="idemail" type="email" placeholder="登録メールアドレス"><button class="plain" id="idbtn">確認</button></div>
+    <div id="log"></div>
+    <div id="chips"></div>
+    <form id="f"><textarea id="t" placeholder="お客さん役として入力（⌘+Enter で送信）"></textarea><button id="sendBtn">送信</button></form>
+  </section>
+  <section id="stage">
+    <div class="lanes-head">
+      <div class="c-front">フロント<small>お客さんの画面</small></div>
+      <div class="c-back">バックエンド<small>自分のループ（Python）</small></div>
+      <div class="c-api">Claude API<small>ネットワークの向こう</small></div>
+      <div class="c-db">DB<small>shop.db（Claude からは見えない）</small></div>
+    </div>
+    <div id="rows"></div>
+    <div id="detail">
+      <div id="grip" title="ドラッグで高さを変える（ダブルクリックで元に戻す）"></div>
+      <div id="stepbar"><span id="stepinfo"></span><button class="plain" id="next">次へ ▶（Space）</button><button class="plain" id="flush">残りを全部</button></div>
+      <div id="stack"><b>messages：</b><span style="color:var(--muted)">（まだ空）</span></div>
+      <div id="jsonTitle">矢印や箱をクリックすると、その瞬間の実 JSON が出ます</div>
+      <pre id="json"></pre>
+    </div>
+  </section>
+</main>
+<script>
+const LANES = ["front", "back", "api", "db"];
+const WHY = {
+  user: "フロントはバックエンドに文字を渡すだけ。お客さんの画面は Claude と直接は話していない",
+  request: "API は前回を覚えていない。毎回、会話の全履歴（messages）とツールの説明書（tools）を丸ごと送り直す",
+  response_tool_use: "Claude は関数を実行できない。「このツールをこの引数で呼んで」と頼んでいるだけ",
+  response_end: "Claude の番はここで終わり（聞き返し or 最終回答）。ループを抜ける",
+  blocked: "Claude がどう頼んでも、自分のコードが実行させない。これが選択肢 A（プログラム的な前提条件）",
+  call: "ここから先は API の外。自分の Python 関数を、自分のコードが呼ぶ",
+  sql: "tools.py → infra/db.py → SQLite。この往復は Claude には一切見えない",
+  rows: "DB の答え。まだバックエンドの中にあるだけ",
+  return: "関数の戻り値はただの dict。Claude にはまだ届いていない",
+  tool_result: "tool_use_id で ② の依頼と対応づけ、role:user として積む。Claude に届くのは次の ①",
+  reply: "最後の text だけをお客さんの画面に出す。途中の tool_use はお客さんには見えない",
+  override: "Claude が書いた引数は使わない。誰のデータを触るかは、バックエンドが保持する本人確認済みの顧客で決める",
+  verified: "本人確認はコードだけで完結。Claude はメールアドレスを一度も見ていないし、書き写してもいない",
+  error: "",
+};
+const $ = s => document.querySelector(s);
+let guard = "none", busy = false, info = null, turn = 0, selEl = null;
+const queue = []; let waiting = null;
+
+function whyOf(ev) {
+  if (ev.kind === "response") return ev.stop_reason === "tool_use" ? WHY.response_tool_use : WHY.response_end;
+  return WHY[ev.kind] || "";
+}
+function select(el, ev) {
+  if (selEl) selEl.classList.remove("sel");
+  selEl = el; el.classList.add("sel");
+  $("#jsonTitle").textContent = ev.title;
+  $("#json").textContent = JSON.stringify(ev.json, null, 2);
+}
+function draw(ev) {
+  const rows = $("#rows");
+  if (ev.kind === "request") {
+    turn++;
+    const sep = document.createElement("div"); sep.className = "turnsep"; sep.textContent = `── ${turn} 回目の API 呼び出し ──`;
+    rows.appendChild(sep);
+    $("#stack").innerHTML = "<b>messages：</b>" + ev.roles.map((r, i) =>
+      `<span class="m ${r.split("(")[0]}">${i + 1}. ${r}</span>`).join("→") +
+      `<span style="color:var(--muted);margin-left:6px">← この ${ev.roles.length} 件を毎回まるごと送る</span>`;
+  }
+  if (ev.kind === "done") return finish(ev);
+  if (ev.kind === "reply") addBubble("bot", ev.text || "（text なし）");
+  if (ev.kind === "verified") { addBubble("sys", (ev.ok ? "✅ " : "❌ ") + ev.text); if (ev.ok) $("#idform").classList.remove("on"); }
+  if (ev.kind === "error") addBubble("sys", ev.title + "：" + (ev.json && ev.json.error));
+
+  const row = document.createElement("div"); row.className = "row";
+  let el;
+  if (ev.from) {
+    const a = LANES.indexOf(ev.from), b = LANES.indexOf(ev.to);
+    el = document.createElement("div");
+    el.className = `arrow ${b > a ? "r" : "l"} c-${ev.from}`;
+    /* 縦線は各レーンの中央（12.5% / 37.5% / 62.5% / 87.5%）。行全体の幅を基準に置く */
+    el.style.marginLeft = `${Math.min(a, b) * 25 + 12.5}%`;
+    el.style.width = `${Math.abs(b - a) * 25}%`;
+    let label = ev.title;
+    if (ev.kind === "response" && ev.tool_uses.length)
+      label += "　📝 " + ev.tool_uses.map(t => `${t.name}(${JSON.stringify(t.input)})`).join(", ");
+    el.innerHTML = `<div class="lbl"></div><div class="shaft"></div>`;
+    el.querySelector(".lbl").textContent = label;
+    el.title = label;
+  } else {
+    el = document.createElement("div");
+    const lane = ev.lane || "back";
+    el.className = `box c-${lane}` + (ev.kind === "blocked" || ev.wrong || ev.structured ? " bad" : "");
+    el.style.left = `${LANES.indexOf(lane) * 25 + 12.5}%`;
+    el.textContent = ev.title + (ev.wrong ? "　💸 別人に返金！" : ev.refund ? "　💸 返金実行" : "");
+    if (ev.kind === "error") el.className = "box bad", el.style.left = "50%";
+  }
+  el.onclick = () => select(el, ev);
+  row.appendChild(el);
+  const w = whyOf(ev);
+  if (w) { const d = document.createElement("div"); d.className = "why"; d.textContent = w; row.appendChild(d); }
+  rows.appendChild(row);
+  rows.scrollTop = rows.scrollHeight;
+  select(el, ev);
+  if (ev.cost != null) meter(ev.cost);
+}
+function meter(cost) {
+  $("#meter").textContent = `${info ? info.model : ""}　費用 ≈ $${cost.toFixed(4)}（${(cost * 150).toFixed(2)}円）`;
+}
+function finish(ev) {
+  meter(ev.cost);
+  if (ev.wrong_refunds) addBubble("sys", `⚠ 別人への返金が ${ev.wrong_refunds} 件発生（呼ばれた順：${ev.called.join(" → ")}）`);
+  busy = false; $("#sendBtn").disabled = false;
+}
+function addBubble(cls, text) {
+  const d = document.createElement("div"); d.className = "bubble " + cls; d.textContent = text;
+  $("#log").appendChild(d); $("#log").scrollTop = 1e9;
+}
+
+/* イベントは届いた順に queue へ。「1本ずつ」ON なら次へで1本、OFF なら 350ms 間隔で流す */
+function pump() {
+  if (waiting || !queue.length) return updateStep();
+  if ($("#step").checked) { updateStep(); return; }
+  draw(queue.shift());
+  waiting = setTimeout(() => { waiting = null; pump(); }, 350);
+}
+function updateStep() {
+  const on = $("#step").checked && queue.length > 0;
+  $("#stepbar").classList.toggle("on", on);
+  $("#stepinfo").textContent = on ? `待機中のステップ ${queue.length} 本` : "";
+}
+$("#next").onclick = () => { if (queue.length) draw(queue.shift()); updateStep(); };
+$("#flush").onclick = () => { while (queue.length) draw(queue.shift()); updateStep(); };
+$("#step").onchange = pump;
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && document.activeElement !== $("#t") && $("#step").checked) { e.preventDefault(); $("#next").click(); }
+});
+/* messages 欄の上の境目をドラッグして高さを変える。高さはこのブラウザにだけ覚えておく */
+(() => {
+  const grip = $("#grip"), detail = $("#detail"), stage = $("#stage");
+  const KEY = "chat.detailHeight";
+  const apply = h => {
+    const max = stage.getBoundingClientRect().height - 120;
+    detail.style.height = Math.max(70, Math.min(h, max)) + "px";
+  };
+  try { const h = +localStorage.getItem(KEY); if (h) apply(h); } catch (e) {}
+  grip.addEventListener("pointerdown", e => {
+    e.preventDefault(); grip.setPointerCapture(e.pointerId);
+    grip.classList.add("drag"); document.body.classList.add("resizing");
+    const move = ev => apply(stage.getBoundingClientRect().bottom - ev.clientY);
+    const up = () => {
+      grip.removeEventListener("pointermove", move); grip.removeEventListener("pointerup", up);
+      grip.classList.remove("drag"); document.body.classList.remove("resizing");
+      try { localStorage.setItem(KEY, parseInt(detail.style.height)); } catch (e) {}
+    };
+    grip.addEventListener("pointermove", move); grip.addEventListener("pointerup", up);
+  });
+  grip.ondblclick = () => { detail.style.height = ""; try { localStorage.removeItem(KEY); } catch (e) {} };
+})();
+$("#why").onchange = e => document.body.classList.toggle("nowhy", !e.target.checked);
+
+async function send(text, url = "/api/send") {
+  if (busy || !text.trim()) return;
+  busy = true; $("#sendBtn").disabled = true;
+  if (url === "/api/send") { addBubble("me", text); $("#t").value = ""; }
+  else addBubble("sys", `🔒 フォームで本人確認：${text}（チャットには流さない）`);
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+  if (!res.ok || !res.body) {
+    addBubble("sys", "送信エラー：" + (await res.text())); busy = false; $("#sendBtn").disabled = false; return;
+  }
+  const reader = res.body.getReader(), dec = new TextDecoder(); let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, i); buf = buf.slice(i + 1);
+      if (line.trim()) { queue.push(JSON.parse(line)); pump(); }
+    }
+  }
+}
+async function reset(g) {
+  if (busy) return;
+  guard = g;
+  await fetch("/api/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ guard, structured: $("#structured").checked, verify_email: $("#verify").checked, form_verify: $("#form").checked }) });
+  queue.length = 0; turn = 0;
+  $("#rows").innerHTML = ""; $("#log").innerHTML = ""; $("#json").textContent = "";
+  $("#stack").innerHTML = '<b>messages：</b><span style="color:var(--muted)">（まだ空）</span>';
+  document.querySelectorAll("#guards button").forEach(b => b.classList.toggle("on", b.dataset.g === guard));
+  addBubble("sys", `新しい会話（${info.guards[guard]}${$("#structured").checked ? "＋構造化エラー" : ""}${$("#verify").checked ? "＋メール照合" : ""}${$("#form").checked ? "＋フォーム本人確認" : ""}）。DB は初期状態に戻しました`);
+  $("#t").value = info.user_msg;
+  $("#idform").classList.toggle("on", $("#form").checked);
+  $("#idemail").value = "";
+  meter(0);
+}
+$("#f").onsubmit = e => { e.preventDefault(); send($("#t").value); };
+$("#t").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("#f").requestSubmit(); });
+$("#reset").onclick = () => reset(guard);
+$("#structured").onchange = () => reset(guard);
+$("#verify").onchange = () => reset(guard);
+$("#form").onchange = () => reset(guard);
+$("#idbtn").onclick = () => send($("#idemail").value, "/api/verify");
+$("#idemail").addEventListener("keydown", e => { if (e.key === "Enter") $("#idbtn").click(); });
+
+(async () => {
+  info = await (await fetch("/api/info")).json();
+  for (const [g, label] of Object.entries(info.guards)) {
+    const b = document.createElement("button"); b.textContent = label; b.dataset.g = g;
+    b.onclick = () => reset(g); $("#guards").appendChild(b);
+  }
+  for (const s of [info.user_msg, `${info.requester_email} です`, `名前は${info.family_name}です。メールは分かりません`]) {
+    const b = document.createElement("button"); b.className = "plain"; b.textContent = s;
+    b.onclick = () => { $("#t").value = s; $("#t").focus(); }; $("#chips").appendChild(b);
+  }
+  await reset("none");
+})();
+</script>
+</body>
+</html>

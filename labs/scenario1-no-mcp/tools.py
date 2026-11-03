@@ -23,6 +23,11 @@ from infra import db   # 🟦 自社DB（infra/db.py → shop.db）。Claude か
 # 「田中」が3人いる初期データは infra/db.py の SEED_CUSTOMERS を参照。
 db.ensure()
 
+# 🟦 True にすると、email で見つからなかったときのエラーを「構造化」して返す（予想問題 1.6・1.7）。
+#    実際に何で検索したか（searched_email）を見せて、Claude が自分の書き写しミスに気づけるようにする。
+#    見える化チャット（replay/chat_server.py）の画面からオン／オフできる。
+STRUCTURED_ERRORS = False
+
 
 # 🟦 以下の関数名・引数名はすべて自分で決めたもの。
 #    ただし引数名は DEFS の input_schema の properties と揃える。
@@ -33,6 +38,13 @@ def get_customer(email: str | None = None, name: str | None = None) -> dict:
         c = db.find_customer_by_email(email)
         if c:
             return {**c, "verified": True}
+        if STRUCTURED_ERRORS:
+            return {"error": "該当する顧客がいません", "verified": False,
+                    "errorCategory": "not_found",     # 何が起きたか
+                    "isRetryable": True,              # 正しい値で呼び直せば成功しうる
+                    "searched_email": email,          # 実際にこの値で検索した
+                    "hint": "顧客の発言にあるメールアドレスと searched_email を一字ずつ照合し、"
+                            "違っていれば顧客に聞き返さず正しい値で呼び直すこと"}
         return {"error": "該当する顧客がいません", "verified": False}
     if name:
         hits = db.find_customers_by_name(name)
