@@ -1,0 +1,454 @@
+<title>エージェントループの全体図</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --front:#c2185b; --front-bg:#fce4ec;
+  --be:#0e7c86; --be-bg:#e8f5f6;
+  --cl:#b8560a; --cl-bg:#fdf0e2;
+  --db:#2e7d32; --db-bg:#e8f5e9;
+  --form:#5b4bb3; --form-bg:#efecfb;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --front:#f48fb1; --front-bg:#3a1828; --be:#5fd3dd; --be-bg:#10333a;
+    --cl:#f0a35c; --cl-bg:#3a2712; --db:#81c784; --db-bg:#12331a;
+    --form:#b2a6f5; --form-bg:#272140; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --front:#f48fb1; --front-bg:#3a1828; --be:#5fd3dd; --be-bg:#10333a;
+  --cl:#f0a35c; --cl-bg:#3a2712; --db:#81c784; --db-bg:#12331a;
+  --form:#b2a6f5; --form-bg:#272140; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:16px;padding-block:28px 60px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--be);font-weight:700;margin:0 0 4px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 6px;padding-top:14px;border-top:1px solid var(--line);text-wrap:balance}
+h2 .n{color:var(--be);margin-right:.5em}
+p,li{font-size:14.5px}
+code{background:var(--code-bg);padding:.06em .34em;border-radius:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+pre{background:var(--code-bg);border-radius:8px;padding:10px 12px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:6px 0}
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-top:12px;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto;min-width:760px}
+.fig img{display:block;width:100%;height:auto;border-radius:6px}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;fill:var(--fg)}
+svg .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+svg .muted{fill:var(--muted)}
+.l-front{fill:var(--front-bg);stroke:var(--front)} .t-front{fill:var(--front)}
+.l-be{fill:var(--be-bg);stroke:var(--be)} .t-be{fill:var(--be)}
+.l-cl{fill:var(--cl-bg);stroke:var(--cl)} .t-cl{fill:var(--cl)}
+.l-db{fill:var(--db-bg);stroke:var(--db)} .t-db{fill:var(--db)}
+.l-form{fill:var(--form-bg);stroke:var(--form)} .t-form{fill:var(--form)}
+.t-warn{fill:var(--warn)}
+.life{stroke:var(--line);stroke-width:2;stroke-dasharray:5 5}
+.ar{stroke-width:2;fill:none}
+.ar.be{stroke:var(--be)} .ar.cl{stroke:var(--cl)} .ar.db{stroke:var(--db)} .ar.front{stroke:var(--front)}
+.pill{fill:var(--card);stroke:var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;border:1.5px solid}
+.chip.front{border-color:var(--front);background:var(--front-bg)}
+.chip.be{border-color:var(--be);background:var(--be-bg)}
+.chip.cl{border-color:var(--cl);background:var(--cl-bg)}
+.chip.db{border-color:var(--db);background:var(--db-bg)}
+.note{border-left:4px solid var(--be);background:var(--be-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+.note.key{border-color:var(--form);background:var(--form-bg)}
+.note.warn{border-color:var(--warn);background:var(--warn-bg)}
+.grow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media (max-width:760px){.grow{grid-template-columns:1fr 1fr}}
+.col{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:8px}
+.col h4{margin:0 0 6px;font-size:13.5px}
+.msg{font-size:12px;border-radius:6px;padding:4px 7px;margin:4px 0;border:1.5px solid;line-height:1.45}
+.msg.u{border-color:var(--front);background:var(--front-bg)}
+.msg.a{border-color:var(--cl);background:var(--cl-bg)}
+.msg.r{border-color:var(--db);background:var(--db-bg)}
+.msg.new{box-shadow:0 0 0 2px var(--form)}
+.col .sr{font-size:12px;font-weight:700;margin-top:6px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:760px){.pair{grid-template-columns:1fr}}
+.box{border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:9px 11px}
+.box.be{border-color:var(--be)} .box.cl{border-color:var(--cl)}
+.box h4{margin:0 0 4px;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media (max-width:760px){.cards{grid-template-columns:1fr}}
+.card{border:1.5px solid var(--warn);background:var(--warn-bg);border-radius:10px;padding:9px 11px;font-size:13.5px}
+.card h4{margin:0 0 4px;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+.tbl{overflow-x:auto}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;position:relative}
+@media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.steps{grid-template-columns:1fr}}
+.step{border:2px solid;border-radius:12px;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:6px}
+.step.be{border-color:var(--be)} .step.cl{border-color:var(--cl)} .step.db{border-color:var(--db)}
+.step .sn{font-size:22px;font-weight:800;line-height:1}
+.step.be .sn{color:var(--be)} .step.cl .sn{color:var(--cl)} .step.db .sn{color:var(--db)}
+.step .st{font-weight:700;font-size:15px}
+.dir{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.who{font-size:12.5px;font-weight:700;padding:2px 8px;border-radius:999px;border:1.5px solid}
+.who.be{color:var(--be);border-color:var(--be);background:var(--be-bg)}
+.who.cl{color:var(--cl);border-color:var(--cl);background:var(--cl-bg)}
+.who.db{color:var(--db);border-color:var(--db);background:var(--db-bg)}
+.arr{font-size:20px;font-weight:800;color:var(--muted)}
+.by{font-size:12px;font-weight:700;align-self:flex-start;padding:2px 9px;border-radius:6px}
+.by.be{background:var(--be);color:var(--bg)} .by.cl{background:var(--cl);color:var(--bg)}
+.step pre{margin:0;font-size:11.5px}
+.step .pt{font-size:13px;margin:0}
+.after{margin-top:8px;font-size:14px;padding:8px 12px;border:1.5px dashed var(--cl);border-radius:8px}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">シナリオ1 ・ カスタマーサポートのエージェント</p>
+  <h1>エージェントループの全体図：「返品したい」から「返金完了」まで</h1>
+  <p class="lede">お客さんの1回の問い合わせの裏で、フロント・あなたのバックエンド・Claude API・DB の4者が何をやりとりしているか。stop_reason でループを続けるか終えるかを決める問題（エージェントの中心ループの問題）の図解です。</p>
+</header>
+
+<h2><span class="n">★</span>覚えるのは3つだけ</h2>
+<div class="fig"><img src="img/agent-3facts-turn068.jpg" alt="エージェントの3つの重要な事実：tool_use はコードによって実行される／毎ラウンド tool_result を含めて messages を再送信する／停止の条件は stop_reason。顧客情報を取得し注文履歴を調べて回答する3ラウンドの例"></div>
+<p style="font-size:13px;color:var(--muted)">turn-review の1枚絵（「エージェント学習」）。①実行するのはコード ②届く道は messages だけ（毎回 tool_result を足して送り直す） ③続けるか終わるかは stop_reason。下段の3ラウンドの例も、JSON の形・向きともに正確です。</p>
+
+
+<h2><span class="n">0</span>結論：tool_use を書くのは Claude。バックエンドが書くのは「メニュー」と「結果」</h2>
+<div class="fig"><img src="img/tool-use-flow-turn63.jpg" alt="Claudeのツール利用の正しい流れ。①ツールのメニューを渡す ②ツールの呼び出しを出す（tool_use） ③バックエンドで関数を実行 ④結果を返す（tool_result）。シーケンス図とメッセージの中身つき"></div>
+<p style="font-size:13px;color:var(--muted)">turn-review が作った1枚絵（「tool_use の矢印修正」）。①〜④の流れ・向き・担当者は正確です。細部の注意：④の JSON の <code>"role": "tool"</code> は Anthropic の API では <code>"role": "user"</code>（その中に <code>{"type": "tool_result", …}</code> のブロックを入れる）。②の <code>"content": null</code> も実際には content のリストの中に tool_use ブロックが入る形です（下の 4 番の実データを参照）。</p>
+
+<p>1回の往復は、左から右へ <strong>4ステップ</strong>。各カードの上の段で「どっちからどっちへ」、色の札で「誰が書いたか」が分かります。</p>
+<div class="steps">
+  <div class="step be">
+    <div class="sn">①</div>
+    <div class="st">メニューと質問を送る</div>
+    <div class="dir"><span class="who be">バックエンド</span><span class="arr">→</span><span class="who cl">Claude</span></div>
+    <div class="by be">書く：バックエンド</div>
+<pre><code>tools: [get_customer,
+        lookup_order, …]
+messages: [
+ {role: "user",
+  content: "返品したい"}]</code></pre>
+    <p class="pt">「使える道具の一覧」と質問を渡すだけ。まだ何も実行しない</p>
+  </div>
+  <div class="step cl">
+    <div class="sn">②</div>
+    <div class="st">tool_use が返ってくる</div>
+    <div class="dir"><span class="who cl">Claude</span><span class="arr">→</span><span class="who be">バックエンド</span></div>
+    <div class="by cl">書く：Claude</div>
+<pre><code>stop_reason: "tool_use"
+content: [
+ {type: "tool_use",
+  id: "toolu_02",
+  name: "lookup_order",
+  input: {order_id: "123"}}]</code></pre>
+    <p class="pt">Claude が一覧から選んで「これを、この引数で使って」と頼む</p>
+  </div>
+  <div class="step db">
+    <div class="sn">③</div>
+    <div class="st">関数を実行する</div>
+    <div class="dir"><span class="who be">バックエンド</span><span class="arr">↻</span><span class="who db">DB</span></div>
+    <div class="by be">やる：バックエンド</div>
+<pre><code>lookup_order("123")
+ → DB を検索
+ → "配達済み・
+    返品期限内"</code></pre>
+    <p class="pt">実行できるのはバックエンドだけ。Claude は DB に触れない</p>
+  </div>
+  <div class="step be">
+    <div class="sn">④</div>
+    <div class="st">結果を送り返す</div>
+    <div class="dir"><span class="who be">バックエンド</span><span class="arr">→</span><span class="who cl">Claude</span></div>
+    <div class="by be">書く：バックエンド</div>
+<pre><code>messages に足す：
+{role: "user",
+ content: [
+  {type: "tool_result",
+   tool_use_id: "toolu_02",
+   content: "配達済み…"}]}</code></pre>
+    <p class="pt">②と同じ番号 toolu_02 を付けて、履歴ごと全部送り直す</p>
+  </div>
+</div>
+<div class="after">→ Claude は ④ を読んで、また ② に戻る（次の tool_use）か、最終回答（stop_reason: "end_turn"）を返す</div>
+<div class="note key"><strong>一言で：</strong>バックエンドから送るのは <strong>① 一覧</strong> と <strong>④ 結果</strong> だけ。<strong>② tool_use はいつも Claude から来る。</strong></div>
+<div class="note warn"><strong>前に載せていた turn-review の絵（「チャット処理の流れ」）は、③の矢印に「Claude に依頼（tool_use）」と書いてあり、バックエンドが tool_use を出しているように見える間違いでした。</strong>混乱のもとなので、このページから外しました。バックエンドから Claude へ送るのは ① と ④ だけです。</div>
+
+<div class="fig"><img src="img/agent-seq-03.png" alt="返品したいから返金完了までの裏側のやりとり。矢印の向きは正確"></div>
+<p style="font-size:13px;color:var(--muted)">↑ 時系列で並べたグラレコ版（矢印の向きはこの図が正確）。③ stop_reason: tool_use とその横の「tool_use: get_customer」は Claude から返ってくるもの。</p>
+
+<h2><span class="n">1</span>登場するのは4者。真ん中に必ず「あなたのバックエンド」</h2>
+<div class="legend">
+  <span class="chip front">フロント：チャット画面</span>
+  <span class="chip be">あなたのバックエンド：ループと関数</span>
+  <span class="chip cl">Claude API：Anthropic のサーバー</span>
+  <span class="chip db">DB：自社のデータ</span>
+</div>
+<div class="fig">
+<svg viewBox="0 0 900 232" role="img" aria-label="フロント、バックエンド、Claude API、DBの4つの箱。フロントとClaude、ClaudeとDBの間には直接の線がない">
+  <defs><marker id="a0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>
+  <rect x="20" y="40" width="170" height="110" rx="10" class="l-front"/>
+  <text x="105" y="72" text-anchor="middle" font-weight="700" class="t-front">フロント</text>
+  <text x="105" y="96" text-anchor="middle" font-size="12.5">チャット画面</text>
+  <text x="105" y="116" text-anchor="middle" font-size="12" class="muted">お客さんが打ち込む</text>
+
+  <rect x="250" y="20" width="220" height="150" rx="10" class="l-be" style="stroke-width:2.5"/>
+  <text x="360" y="50" text-anchor="middle" font-weight="700" class="t-be">あなたのバックエンド</text>
+  <text x="360" y="74" text-anchor="middle" font-size="12.5">エージェントのループ（agent.py）</text>
+  <rect x="268" y="88" width="184" height="66" rx="6" class="pill"/>
+  <text x="360" y="106" text-anchor="middle" font-size="11.5" class="muted">ツールの関数（tools.py）</text>
+  <text x="360" y="124" text-anchor="middle" font-size="11.5" class="mono">get_customer  lookup_order</text>
+  <text x="360" y="142" text-anchor="middle" font-size="11.5" class="mono">process_refund  escalate…</text>
+
+  <rect x="530" y="40" width="170" height="110" rx="10" class="l-cl"/>
+  <text x="615" y="72" text-anchor="middle" font-weight="700" class="t-cl">Claude API</text>
+  <text x="615" y="96" text-anchor="middle" font-size="12.5">Anthropic のサーバー</text>
+  <text x="615" y="116" text-anchor="middle" font-size="12" class="muted">考える・道具を選ぶ</text>
+
+  <rect x="740" y="40" width="140" height="110" rx="10" class="l-db"/>
+  <text x="810" y="72" text-anchor="middle" font-weight="700" class="t-db">DB</text>
+  <text x="810" y="96" text-anchor="middle" font-size="12.5">顧客・注文</text>
+  <text x="810" y="116" text-anchor="middle" font-size="12" class="muted">自社のデータ</text>
+
+  <line x1="194" y1="95" x2="246" y2="95" class="ar front" marker-start="url(#a0)" marker-end="url(#a0)"/>
+  <line x1="474" y1="95" x2="526" y2="95" class="ar cl" marker-start="url(#a0)" marker-end="url(#a0)"/>
+  <path d="M452,160 C520,215 720,215 790,154" class="ar db" marker-end="url(#a0)"/>
+  <text x="620" y="222" text-anchor="middle" font-size="12" class="t-db">DB に行くのはバックエンドの関数だけ</text>
+  <text x="700" y="22" text-anchor="middle" font-size="12" class="t-warn">✗ Claude は DB にもフロントにも直接つながっていない</text>
+</svg>
+</div>
+
+<h2><span class="n">2</span>1回の問い合わせを、時間の順に追う</h2>
+<p>上から下へ時間が進みます。縦の点線が4者。<strong>③〜⑦の往復が「ループ」</strong>で、stop_reason が <code>tool_use</code> の間くり返します。</p>
+<div class="fig">
+<svg viewBox="0 0 900 760" role="img" aria-label="フロント、バックエンド、Claude API、DBの間のやりとりを時間順に並べたシーケンス図">
+  <defs>
+    <marker id="af" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--front)"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--be)"/></marker>
+    <marker id="ac" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--cl)"/></marker>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--db)"/></marker>
+  </defs>
+  <!-- heads -->
+  <rect x="50" y="10" width="120" height="36" rx="8" class="l-front"/><text x="110" y="34" text-anchor="middle" font-weight="700" class="t-front">フロント</text>
+  <rect x="270" y="10" width="160" height="36" rx="8" class="l-be"/><text x="350" y="34" text-anchor="middle" font-weight="700" class="t-be">バックエンド</text>
+  <rect x="540" y="10" width="140" height="36" rx="8" class="l-cl"/><text x="610" y="34" text-anchor="middle" font-weight="700" class="t-cl">Claude API</text>
+  <rect x="760" y="10" width="110" height="36" rx="8" class="l-db"/><text x="815" y="34" text-anchor="middle" font-weight="700" class="t-db">DB</text>
+  <line x1="110" y1="46" x2="110" y2="745" class="life"/>
+  <line x1="350" y1="46" x2="350" y2="745" class="life"/>
+  <line x1="610" y1="46" x2="610" y2="745" class="life"/>
+  <line x1="815" y1="46" x2="815" y2="745" class="life"/>
+
+  <!-- loop bracket -->
+  <rect x="215" y="160" width="660" height="468" rx="12" style="fill:none;stroke:var(--form);stroke-width:2;stroke-dasharray:7 5"/>
+  <rect x="222" y="148" width="300" height="24" rx="6" class="l-form"/>
+  <text x="232" y="165" font-size="12.5" font-weight="700" class="t-form">ループ：stop_reason が tool_use の間くり返す</text>
+
+  <!-- 1 -->
+  <line x1="112" y1="80" x2="345" y2="80" class="ar front" marker-end="url(#af)"/>
+  <text x="122" y="72" font-size="12.5"><tspan font-weight="700">①</tspan> 「注文 #123 を返品したい」</text>
+
+  <!-- 2 -->
+  <line x1="352" y1="128" x2="605" y2="128" class="ar be" marker-end="url(#ab)"/>
+  <text x="362" y="106" font-size="12.5"><tspan font-weight="700">②</tspan> messages（質問）＋ tools（道具4つの説明）</text>
+  <text x="362" y="121" font-size="11" class="muted mono">client.messages.create(…)</text>
+
+  <!-- 3 -->
+  <line x1="608" y1="200" x2="355" y2="200" class="ar cl" marker-end="url(#ac)"/>
+  <text x="370" y="186" font-size="12.5"><tspan font-weight="700">③</tspan> stop_reason: <tspan class="mono t-cl" font-weight="700">"tool_use"</tspan></text>
+  <rect x="620" y="176" width="245" height="46" rx="6" class="l-form"/>
+  <text x="630" y="194" font-size="11.5" class="mono">tool_use: get_customer</text>
+  <text x="630" y="212" font-size="11.5" class="mono">input: {"email": "tanaka@…"}</text>
+
+  <!-- guard -->
+  <rect x="268" y="234" width="164" height="40" rx="6" class="pill" style="stroke:var(--warn)"/>
+  <text x="350" y="251" text-anchor="middle" font-size="11.5" class="t-warn" font-weight="700">関門：実行してよいか？</text>
+  <text x="350" y="267" text-anchor="middle" font-size="10.5" class="muted">（本人確認前の返金は止める）</text>
+
+  <!-- 4 -->
+  <line x1="352" y1="300" x2="810" y2="300" class="ar db" marker-end="url(#ad)"/>
+  <text x="440" y="292" font-size="12.5"><tspan font-weight="700">④</tspan> get_customer() を実際に実行 → DB を検索</text>
+  <!-- 5 -->
+  <line x1="813" y1="336" x2="355" y2="336" class="ar db" marker-end="url(#ad)"/>
+  <text x="440" y="328" font-size="12.5"><tspan font-weight="700">⑤</tspan> 「田中さん・本人確認OK」</text>
+
+  <!-- 6 -->
+  <line x1="352" y1="384" x2="605" y2="384" class="ar be" marker-end="url(#ab)"/>
+  <text x="362" y="362" font-size="12.5"><tspan font-weight="700">⑥</tspan> messages（ここまでの履歴）＋ tool_result</text>
+  <text x="362" y="377" font-size="11" class="muted mono">もう一度 client.messages.create(…)</text>
+
+  <!-- 7 -->
+  <line x1="608" y1="440" x2="355" y2="440" class="ar cl" marker-end="url(#ac)"/>
+  <text x="370" y="426" font-size="12.5"><tspan font-weight="700">⑦</tspan> stop_reason: <tspan class="mono t-cl" font-weight="700">"tool_use"</tspan></text>
+  <rect x="620" y="418" width="245" height="44" rx="6" class="l-form"/>
+  <text x="630" y="436" font-size="11.5" class="mono">tool_use: lookup_order</text>
+  <text x="630" y="453" font-size="11.5" class="mono">input: {"order_id": "123"}</text>
+
+  <!-- collapsed -->
+  <rect x="268" y="484" width="590" height="70" rx="8" class="pill"/>
+  <text x="563" y="508" text-anchor="middle" font-size="12.5">④〜⑦と同じ往復が続く：</text>
+  <text x="563" y="528" text-anchor="middle" font-size="12" class="mono">lookup_order 実行 →「配達済み・返品期限内」→ tool_use: process_refund</text>
+  <text x="563" y="545" text-anchor="middle" font-size="12" class="mono">→ process_refund 実行 →「返金完了」→ Claude へ</text>
+
+  <!-- branch -->
+  <rect x="268" y="572" width="164" height="44" rx="8" style="fill:var(--card);stroke:var(--form);stroke-width:2"/>
+  <text x="350" y="591" text-anchor="middle" font-size="12" font-weight="700" class="t-form">stop_reason を見る</text>
+  <text x="350" y="608" text-anchor="middle" font-size="10.5" class="muted">tool_use → 上に戻る</text>
+
+  <!-- 8 -->
+  <line x1="608" y1="660" x2="355" y2="660" class="ar cl" marker-end="url(#ac)"/>
+  <text x="370" y="646" font-size="12.5"><tspan font-weight="700">⑧</tspan> stop_reason: <tspan class="mono t-cl" font-weight="700">"end_turn"</tspan></text>
+  <rect x="620" y="638" width="245" height="44" rx="6" class="l-cl"/>
+  <text x="630" y="656" font-size="11.5">text:「返金手続きが</text>
+  <text x="630" y="673" font-size="11.5">　　　完了しました」</text>
+
+  <!-- 9 -->
+  <line x1="348" y1="716" x2="115" y2="716" class="ar front" marker-end="url(#af)"/>
+  <text x="125" y="706" font-size="12.5"><tspan font-weight="700">⑨</tspan> ループを抜けて表示</text>
+  <text x="125" y="736" font-size="12" class="t-front">「返金手続きが完了しました」</text>
+</svg>
+</div>
+<div class="note key"><strong>ポイント：</strong>オレンジの矢印（Claude → バックエンド）は、いつも<strong>「お願い」か「最終回答」</strong>のどちらか。その区別を付けているのが stop_reason です。緑の矢印（DB とのやりとり）は、必ずバックエンドからしか出ていません。</div>
+
+<h2><span class="n">3</span>毎周、Claude に「全部の履歴」を送り直している</h2>
+<p>Claude API は、前回の呼び出しを覚えていません。だからバックエンドは、毎周 <code>messages</code> に履歴を積み足して、<strong>最初から全部送り直します</strong>。紫の枠が、その周で新しく足されたものです。</p>
+<div class="note key"><strong>よくある取り違え：「履歴」は input ではなく messages です。</strong>input は、tool_use ブロックの中の「引数」（例：<code>{"order_id": "123"}</code>）のこと。履歴を足していくのは、いちばん外側の <code>messages</code> のリストです。</div>
+<pre><code>messages ← 履歴はここ。毎周、末尾に足して、全部まとめて送る
+├ {role: "user",      content: "注文#123を返品したい"}           お客さんの質問
+├ {role: "assistant", content: [                                  Claude の返事（1周目）
+│     {type: "text",     text: "お調べします"},
+│     {type: "tool_use", id: "toolu_01", name: "get_customer",
+│                        input: {"email": "tanaka@…"}}  ]}      ← input はこの中の「引数」だけ
+├ {role: "user",      content: [                                  バックエンドが足す（1周目の結果）
+│     {type: "tool_result", tool_use_id: "toolu_01", content: "田中さん・確認OK"} ]}
+├ {role: "assistant", content: [ {type: "tool_use", id: "toolu_02",
+│                                 name: "lookup_order", input: {"order_id": "123"}} ]}
+└ {role: "user",      content: [ {type: "tool_result", tool_use_id: "toolu_02",
+                                  content: "配達済み・返品期限内"} ]}       ← 今回足した分</code></pre>
+<div class="grow">
+  <div class="col"><h4>1周目に送るもの</h4>
+    <div class="msg u new">user：注文#123を返品したい</div>
+    <div class="sr t-cl" style="color:var(--cl)">→ 返事：tool_use（get_customer）</div>
+  </div>
+  <div class="col"><h4>2周目に送るもの</h4>
+    <div class="msg u">user：注文#123を返品したい</div>
+    <div class="msg a new">assistant：tool_use get_customer</div>
+    <div class="msg r new">user：tool_result 田中さん・確認OK</div>
+    <div class="sr" style="color:var(--cl)">→ 返事：tool_use（lookup_order）</div>
+  </div>
+  <div class="col"><h4>3周目に送るもの</h4>
+    <div class="msg u">user：返品したい</div>
+    <div class="msg a">assistant：get_customer</div>
+    <div class="msg r">user：田中さん・確認OK</div>
+    <div class="msg a new">assistant：tool_use lookup_order</div>
+    <div class="msg r new">user：tool_result 配達済み・期限内</div>
+    <div class="sr" style="color:var(--cl)">→ 返事：tool_use（process_refund）</div>
+  </div>
+  <div class="col"><h4>4周目に送るもの</h4>
+    <div class="msg u">user：返品したい</div>
+    <div class="msg a">assistant：get_customer</div>
+    <div class="msg r">user：確認OK</div>
+    <div class="msg a">assistant：lookup_order</div>
+    <div class="msg r">user：配達済み</div>
+    <div class="msg a new">assistant：tool_use process_refund</div>
+    <div class="msg r new">user：tool_result 返金完了</div>
+    <div class="sr" style="color:var(--cl)">→ 返事：<strong>end_turn</strong>「返金完了しました」</div>
+  </div>
+</div>
+<p style="font-size:13px;color:var(--muted)">ピンク＝お客さんの発言、オレンジ＝Claude の返事（お願い）、緑＝ツールの実行結果（tool_result。API の決まりで role は "user" として送る）</p>
+
+<h2><span class="n">4</span>1周目と2周目の中身（実際のデータ）</h2>
+<div class="fig"><img src="img/api-message-format-turn064.jpg" alt="ツール呼び出し（tool_use）、ツールの実行結果（tool_result）、最終的な回答の、API の実際のメッセージ形式"></div>
+<p style="font-size:13px;color:var(--muted)">turn-review の1枚絵（「API のメッセージ形式」）。0 番の絵の ②注文票・④料理、そしてループの最後の最終回答を、<strong>API に実際に載る JSON の形</strong>で描いたもの。形は正確です（tool_result は role: user の中に入れる／tool_use は content の配列の中に入る）。</p>
+
+<div class="pair">
+  <div class="box be"><h4 class="t-be" style="color:var(--be)">1周目：バックエンドが送る</h4>
+<pre><code>messages = [
+  {"role": "user",
+   "content": "注文#123を返品したい"}
+]
+tools = [get_customer, lookup_order,
+         process_refund, escalate_to_human]</code></pre></div>
+  <div class="box cl"><h4 style="color:var(--cl)">1周目：Claude が返す</h4>
+<pre><code>stop_reason: "tool_use"
+content: [
+  {"type": "text", "text": "お調べします"},
+  {"type": "tool_use", "id": "t1",
+   "name": "get_customer",
+   "input": {"email": "tanaka@…"}}
+]</code></pre></div>
+  <div class="box be"><h4 style="color:var(--be)">2周目：バックエンドが送る</h4>
+<pre><code>messages = [
+  {"role": "user", "content": "注文#123を返品したい"},
+  {"role": "assistant", "content": [↑1周目の返事そのまま]},
+  {"role": "user", "content": [
+     {"type": "tool_result", "tool_use_id": "t1",
+      "content": "田中さん・本人確認OK"}]}
+]</code></pre></div>
+  <div class="box cl"><h4 style="color:var(--cl)">2周目：Claude が返す</h4>
+<pre><code>stop_reason: "tool_use"
+content: [
+  {"type": "tool_use", "id": "t2",
+   "name": "lookup_order",
+   "input": {"order_id": "123"}}
+]</code></pre></div>
+</div>
+<div class="note">1周目の返事に <strong>文章（"お調べします"）と tool_use が一緒に</strong>入っていることに注目。これが、選択肢 D（文章があったら止める）が失敗する理由です。</div>
+
+<h2><span class="n">5</span>コードではこの3行が判断している</h2>
+<pre><code>for turn in range(MAX_TURNS):                     # 暴走防止の上限（終わりの判断ではない）
+    res = client.messages.create(…, tools=…, messages=messages)
+    messages.append({"role": "assistant", "content": res.content})
+
+    if res.stop_reason != "tool_use":              # ← ここが判断。end_turn なら
+        break                                      #    ループを抜けて最終回答を表示
+
+    for b in res.content:                          # tool_use ブロックだけ拾って
+        if b.type == "tool_use":
+            result = IMPL[b.name](**b.input)       # 実際に関数を実行（DB にアクセス）
+            … tool_result を messages に足す        # 次の周で Claude に送る</code></pre>
+<p>練習用コード <code>labs/scenario1-no-mcp/agent.py</code> の「50行のループ」と同じ形です。</p>
+
+<h2><span class="n">6</span>ほかの選択肢は、どこで壊れるか</h2>
+<div class="cards">
+  <div class="card"><h4>A：「解決しました」を探す</h4>
+  Claude が「返金いたしました」と書いたら見逃してループが止まらない。途中で「解決しましたらご連絡します」と書いたら早まって止まる。<br><strong>決まった合図（stop_reason）があるのに、文章から推測している。</strong></div>
+  <div class="card"><h4>C：ちょうど5回回す</h4>
+  この例は4周で終わるのに5周目を回そうとする。7周必要な問い合わせは途中で切れる。<br><strong>回数の上限は安全装置（MAX_TURNS）であって、終わりの判断ではない。</strong></div>
+  <div class="card"><h4>D：文章があったら止める</h4>
+  4の図の1周目のように「お調べします」＋ tool_use が同じ返事に入る。ここで止まると、顧客も注文も調べずに終わる。<br><strong>文章の有無と、終わったかどうかは別。</strong></div>
+</div>
+
+<h2><span class="n">8</span>本物の API で動かした記録（2026-11-01・claude-haiku-4-5）</h2>
+<p><code>labs/scenario1-no-mcp/replay/live.py --auto-reply</code> で実際に1件流した結果です。1ステップずつの再生は <a href="13_live-run-replay.html">13_live-run-replay.html</a>。</p>
+<div class="tbl"><table>
+  <tr><th>周</th><th>① 送った messages</th><th>② 返ってきたもの</th><th>③ バックエンドが実行</th></tr>
+  <tr><td>1</td><td>1件（お客さん「田中です。スニーカーを返品・返金して」）</td><td><code>end_turn</code>：「メールアドレスとフルネームを教えてください」</td><td>なし（聞き返して Claude の番が終わった）</td></tr>
+  <tr><td colspan="4" style="background:var(--front-bg)">👤 お客さん役：「hanako.tanaka@example.com です」→ user として messages に足して続ける</td></tr>
+  <tr><td>2</td><td>3件</td><td><code>tool_use</code> が <strong>2つ同時</strong>：<br><code>get_customer(email=hanako…)</code>／<code>lookup_order(customer_name="田中")</code></td><td>get_customer → 田中花子（C-2044）本人確認OK<br>lookup_order → 名前だけで検索し、<strong>田中太郎（C-8831）の注文 O-42 を推測で拾う</strong> ⚠</td></tr>
+  <tr><td>3</td><td>5件（tool_result を2つ足した。tool_use_id でそれぞれ対応）</td><td><code>end_turn</code>：「田中花子様、注文 O-42 ランニングシューズ ¥12,800 でよろしいですか？」</td><td>なし。返金はまだ（お金は動かなかった）</td></tr>
+</table></div>
+<div class="note warn"><strong>本物で起きたこと：</strong>本人確認（get_customer）と注文検索（lookup_order）を<strong>同時に</strong>頼んだため、確認結果を使わずに名前だけで注文を探し、<strong>花子さんに太郎さんの注文を見せた</strong>。今回は返金の前に確認を挟んだが、そのまま process_refund を呼んでいたら別人の注文に返金していた。</div>
+<div class="tbl"><table>
+  <tr><th>この記録から分かること</th><th>試験のどこにつながるか</th></tr>
+  <tr><td>1つの返事に tool_use が複数入る → 結果は <code>tool_use_id</code> で対応づけて返す</td><td>ツールの結果を Claude にどう届けるかの問題（正解：ID 付きの tool_result を messages に足して送り直す）</td></tr>
+  <tr><td><code>end_turn</code> は「解決した」ではなく「Claude の番が終わった」。聞き返しでも end_turn</td><td>ループの止め方の問題（「解決しました」という言葉を探す選択肢が✗の理由）</td></tr>
+  <tr><td>「本人確認してから注文検索」の順番を Claude は守らないことがある</td><td>返金の上限・順番をフック（コード）で強制する問題。お願い（プロンプト）では確実にならない</td></tr>
+</table></div>
+
+<h2><span class="n">7</span>用語のまとめ</h2>
+<div class="tbl"><table>
+  <tr><th>用語</th><th>意味</th><th>図のどこ</th></tr>
+  <tr><td><code>tools</code></td><td>使える道具の説明の一覧（白紙の記入用紙の束）</td><td>②で送る</td></tr>
+  <tr><td><code>tool_use</code></td><td>Claude の「この道具をこの引数で使って」というお願い</td><td>③⑦の紫の箱</td></tr>
+  <tr><td><code>tool_result</code></td><td>バックエンドが実行した結果。次の周で Claude に送る</td><td>⑥</td></tr>
+  <tr><td><code>stop_reason: "tool_use"</code></td><td>「道具を使ってほしいので止まりました」→ ループを続ける</td><td>③⑦</td></tr>
+  <tr><td><code>stop_reason: "end_turn"</code></td><td>「答え終わりました」→ ループを抜けて表示</td><td>⑧</td></tr>
+  <tr><td><code>messages</code></td><td>会話の履歴。毎周、全部送り直す</td><td>3 の図</td></tr>
+  <tr><td>関門（フック・ガード）</td><td>実行する前にバックエンドが止められる場所</td><td>③と④の間の赤枠</td></tr>
+</table></div>
+</div>

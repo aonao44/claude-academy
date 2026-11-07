@@ -1,0 +1,245 @@
+<title>tool_choice の見え方</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --form:#5b4bb3; --form-bg:#efecfb;
+  --ok:#2e7d32; --ok-bg:#e8f5e9;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7; --off:#c9c4bc;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --form:#b2a6f5; --form-bg:#272140; --ok:#81c784; --ok-bg:#12331a;
+    --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --off:#4a4652;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --form:#b2a6f5; --form-bg:#272140; --ok:#81c784; --ok-bg:#12331a;
+  --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --off:#4a4652;
+}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:960px;margin:0 auto;padding-inline:18px;padding-block:28px 60px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--mine);font-weight:700;margin:0 0 4px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 6px;padding-top:14px;border-top:1px solid var(--line);text-wrap:balance}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+p,li{font-size:14.5px}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-top:12px;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto;min-width:720px}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;fill:var(--fg)}
+svg .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+svg .muted{fill:var(--muted)}
+.box-mine{fill:var(--mine-bg);stroke:var(--mine)}
+.box-claude{fill:var(--theirs-bg);stroke:var(--theirs)}
+.paper{fill:var(--card);stroke:var(--line)}
+.form{fill:var(--form-bg);stroke:var(--form)}
+.form-off{fill:none;stroke:var(--off);stroke-dasharray:4 3}
+.letter{fill:var(--card);stroke:var(--theirs)}
+.letter-off{fill:none;stroke:var(--off);stroke-dasharray:4 3}
+.arrow{stroke:var(--muted);stroke-width:1.6;fill:none}
+.t-off{fill:var(--off)}
+.t-form{fill:var(--form)}
+.t-claude{fill:var(--theirs)}
+.t-ok{fill:var(--ok)}
+.t-warn{fill:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+.tbl{overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+.chip.good,td.good{background:var(--ok-bg)}
+.chip.meh,td.meh{background:var(--theirs-bg)}
+.chip.bad,td.bad{background:var(--warn-bg)}
+table.sim{table-layout:fixed;min-width:640px}
+table.sim th:first-child{width:80px}
+table.sim th{font-size:14.5px}
+table.sim td{font-size:14px;line-height:1.6}
+.sub{font-size:12px;color:var(--muted);font-weight:400}
+tr.total td{font-weight:600}
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+.note.key{border-color:var(--form);background:var(--form-bg)}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">シナリオ6 ・ 問題 6.1 / 6.2</p>
+  <h1>tool_choice の見え方：記入用紙で考える</h1>
+  <p class="lede">「ツール＝白紙の記入用紙」「tool_use＝記入して返ってきた用紙」「tool_choice＝どの返し方を許すか」。請求書・契約書・領収書の3種類が混ざって届く場面で並べます。</p>
+</header>
+
+<h2><span class="n">1</span>1往復の全体像</h2>
+<p>あなたのプログラムは、文書と<strong>白紙の用紙3枚</strong>と<strong>ルール（tool_choice）</strong>を Claude に渡します。Claude は用紙を1枚選んで記入し、返します。それが <code>tool_use</code> ブロックです。</p>
+<div class="fig">
+<svg viewBox="0 0 900 330" role="img" aria-label="プログラムが文書と白紙の用紙3枚とtool_choiceを渡し、Claudeが記入済みの用紙をtool_useとして返す流れ">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/></marker></defs>
+
+  <rect x="10" y="20" width="300" height="290" rx="10" class="box-mine"/>
+  <text x="24" y="44" font-weight="700" style="fill:var(--mine)">あなたのプログラム（送るもの）</text>
+
+  <rect x="26" y="60" width="268" height="44" rx="6" class="paper"/>
+  <text x="38" y="80" font-size="13">📄 文書の文章（種類は不明）</text>
+  <text x="38" y="97" font-size="11.5" class="muted">「株式会社ABC 御中 … ご請求金額 ¥55,000 …」</text>
+
+  <text x="26" y="128" font-size="13" font-weight="600">tools＝ 白紙の用紙3枚</text>
+  <rect x="26" y="136" width="84" height="74" rx="5" class="form"/>
+  <text x="34" y="154" font-size="11" class="mono t-form">invoice</text>
+  <text x="34" y="172" font-size="10.5">取引先[　]</text>
+  <text x="34" y="187" font-size="10.5">金額[　]</text>
+  <text x="34" y="202" font-size="10.5">期限[　]</text>
+  <rect x="118" y="136" width="84" height="74" rx="5" class="form"/>
+  <text x="126" y="154" font-size="11" class="mono t-form">contract</text>
+  <text x="126" y="172" font-size="10.5">相手[　]</text>
+  <text x="126" y="187" font-size="10.5">期間[　]</text>
+  <text x="126" y="202" font-size="10.5">解約[　]</text>
+  <rect x="210" y="136" width="84" height="74" rx="5" class="form"/>
+  <text x="218" y="154" font-size="11" class="mono t-form">receipt</text>
+  <text x="218" y="172" font-size="10.5">店名[　]</text>
+  <text x="218" y="187" font-size="10.5">日付[　]</text>
+  <text x="218" y="202" font-size="10.5">合計[　]</text>
+
+  <text x="26" y="238" font-size="13" font-weight="600">tool_choice＝ 返し方のルール</text>
+  <rect x="26" y="248" width="268" height="44" rx="6" class="paper"/>
+  <text x="38" y="275" font-size="13" class="mono">{"type": "any"}</text>
+  <text x="168" y="275" font-size="11.5" class="muted">← 6.2 の正解</text>
+
+  <line x1="314" y1="120" x2="384" y2="120" class="arrow" marker-end="url(#ah)"/>
+  <text x="322" y="110" font-size="11" class="muted">API で送る</text>
+
+  <rect x="390" y="70" width="180" height="120" rx="10" class="box-claude"/>
+  <text x="480" y="104" text-anchor="middle" font-weight="700" class="t-claude">Claude</text>
+  <text x="480" y="130" text-anchor="middle" font-size="12">文書を読む</text>
+  <text x="480" y="148" text-anchor="middle" font-size="12">→「これは請求書だ」</text>
+  <text x="480" y="166" text-anchor="middle" font-size="12">→ invoice 用紙に記入</text>
+
+  <line x1="574" y1="130" x2="644" y2="130" class="arrow" marker-end="url(#ah)"/>
+  <text x="580" y="120" font-size="11" class="muted">返事</text>
+
+  <rect x="650" y="40" width="240" height="180" rx="8" class="form"/>
+  <text x="664" y="64" font-size="13" font-weight="700" class="t-form">記入済みの用紙 ＝ tool_use</text>
+  <text x="664" y="88" font-size="12" class="mono">name: "extract_invoice"</text>
+  <text x="664" y="110" font-size="12" class="mono">input:</text>
+  <text x="680" y="130" font-size="12">取引先 [株式会社ABC]</text>
+  <text x="680" y="150" font-size="12">金額　 [55000]</text>
+  <text x="680" y="170" font-size="12">期限　 [2026-11-30]</text>
+  <text x="664" y="203" font-size="11" class="muted">↑ この中身が .input</text>
+
+  <line x1="770" y1="224" x2="770" y2="258" class="arrow" marker-end="url(#ah)"/>
+  <rect x="650" y="262" width="240" height="48" rx="8" class="box-mine"/>
+  <text x="770" y="282" text-anchor="middle" font-size="12.5">プログラムが .input を読む</text>
+  <text x="770" y="300" text-anchor="middle" font-size="12.5">→ 会計ソフトに登録</text>
+</svg>
+</div>
+
+<h2><span class="n">2</span>tool_choice ＝ Claude に許す「返し方」</h2>
+<p>返し方の数は「便箋（普通の文章）1通り ＋ 渡したツールの数」。この例ではツールを3つ渡しているので、<strong>便箋</strong>、または用紙 invoice / contract / receipt のどれか、の4通りです。tool_choice は、そのうちどれを許すかを決めます。点線は「禁止」です。</p>
+<div class="fig">
+<svg viewBox="0 0 900 300" role="img" aria-label="auto は便箋と用紙3枚すべて許可、any は用紙3枚のみ許可、tool 指定は1枚のみ許可">
+  <g>
+    <rect x="10" y="10" width="285" height="280" rx="10" class="paper"/>
+    <text x="24" y="38" font-weight="700" class="mono">"auto"</text>
+    <text x="24" y="60" font-size="12.5" class="muted">使うかどうかも Claude 任せ</text>
+    <rect x="24" y="76" width="120" height="60" rx="5" class="letter"/>
+    <text x="34" y="98" font-size="12" class="t-claude">✉ 便箋（文章）</text>
+    <text x="34" y="120" font-size="10.5" class="muted">「これは請求書の</text>
+    <text x="34" y="132" font-size="10.5" class="muted">ようですね…」</text>
+    <rect x="156" y="76" width="56" height="60" rx="5" class="form"/><text x="184" y="111" text-anchor="middle" font-size="10.5" class="mono t-form">invoice</text>
+    <rect x="220" y="76" width="56" height="60" rx="5" class="form"/><text x="248" y="111" text-anchor="middle" font-size="10" class="mono t-form">contract</text>
+    <rect x="156" y="144" width="56" height="60" rx="5" class="form"/><text x="184" y="179" text-anchor="middle" font-size="10" class="mono t-form">receipt</text>
+    <text x="24" y="232" font-size="13" font-weight="700" class="t-warn">✗ 6.2 では不可</text>
+    <text x="24" y="254" font-size="12">便箋で返す道が残っている</text>
+    <text x="24" y="273" font-size="12">→ プログラムが読めずに止まる</text>
+  </g>
+  <g>
+    <rect x="307" y="10" width="285" height="280" rx="10" class="paper" style="stroke:var(--ok);stroke-width:2"/>
+    <text x="321" y="38" font-weight="700" class="mono">"any"</text>
+    <text x="321" y="60" font-size="12.5" class="muted">必ずどれかの用紙。どれかは Claude 任せ</text>
+    <rect x="321" y="76" width="120" height="60" rx="5" class="letter-off"/>
+    <text x="331" y="111" font-size="12" class="t-off">✉ 便箋　禁止</text>
+    <rect x="453" y="76" width="56" height="60" rx="5" class="form"/><text x="481" y="111" text-anchor="middle" font-size="10.5" class="mono t-form">invoice</text>
+    <rect x="517" y="76" width="56" height="60" rx="5" class="form"/><text x="545" y="111" text-anchor="middle" font-size="10" class="mono t-form">contract</text>
+    <rect x="453" y="144" width="56" height="60" rx="5" class="form"/><text x="481" y="179" text-anchor="middle" font-size="10" class="mono t-form">receipt</text>
+    <text x="321" y="232" font-size="13" font-weight="700" class="t-ok">✓ 6.2 の正解</text>
+    <text x="321" y="254" font-size="12">必ず用紙で返る（構造化が保証）</text>
+    <text x="321" y="273" font-size="12">種類に合う用紙を Claude が選ぶ</text>
+  </g>
+  <g>
+    <rect x="604" y="10" width="285" height="280" rx="10" class="paper"/>
+    <text x="618" y="38" font-weight="700" class="mono">{"type":"tool","name":…}</text>
+    <text x="618" y="60" font-size="12.5" class="muted">この1枚に必ず記入</text>
+    <rect x="618" y="76" width="120" height="60" rx="5" class="letter-off"/>
+    <text x="628" y="111" font-size="12" class="t-off">✉ 便箋　禁止</text>
+    <rect x="750" y="76" width="56" height="60" rx="5" class="form"/><text x="778" y="111" text-anchor="middle" font-size="10.5" class="mono t-form">invoice</text>
+    <rect x="814" y="76" width="56" height="60" rx="5" class="form-off"/><text x="842" y="111" text-anchor="middle" font-size="10" class="mono t-off">contract</text>
+    <rect x="750" y="144" width="56" height="60" rx="5" class="form-off"/><text x="778" y="179" text-anchor="middle" font-size="10" class="mono t-off">receipt</text>
+    <text x="618" y="232" font-size="13" font-weight="700" class="t-warn">✗ 6.2 では不可</text>
+    <text x="618" y="254" font-size="12">契約書が来ても請求書用紙しかない</text>
+    <text x="618" y="273" font-size="12">→ 欄に合わない値を無理に埋める</text>
+  </g>
+</svg>
+</div>
+<p>選択肢 D「tool_choice を省略」は、<code>"auto"</code> と同じ動きです（省略時のデフォルトが auto）。</p>
+
+<h2><span class="n">3</span>3種類の文書が届いたら、どうなるか</h2>
+<p>3つの設定それぞれで、請求書・契約書・領収書を1枚ずつ流してみた結果です。</p>
+<div class="legend">
+  <span class="chip good">✓ 成功：正しい用紙に記入される</span>
+  <span class="chip meh">△ ときどき失敗：文章で返ってきてプログラムが止まる</span>
+  <span class="chip bad">✗ 失敗：違う用紙に無理やり記入される</span>
+</div>
+<div class="tbl">
+<table class="sim">
+  <tr>
+    <th>届いた文書</th>
+    <th>auto<br><span class="sub">使うかどうかも Claude 任せ</span><br><span class="sub">問題 6.2 の選択肢 B・D</span></th>
+    <th>any<br><span class="sub">必ずどれかの用紙に記入</span><br><span class="sub">問題 6.2 の選択肢 A（正解）</span></th>
+    <th>請求書用紙に固定<br><span class="sub">名前で1枚を指定</span><br><span class="sub">問題 6.2 の選択肢 C</span></th>
+  </tr>
+  <tr><td><strong>請求書</strong></td>
+    <td class="good">✓ 請求書用紙に記入</td>
+    <td class="good">✓ 請求書用紙に記入</td>
+    <td class="good">✓ 請求書用紙に記入</td></tr>
+  <tr><td><strong>契約書</strong></td>
+    <td class="meh">△ たいてい契約書用紙に記入。<br>ときどき文章で「これは契約書のようです。どの項目が必要ですか？」と返す → プログラムが読めずに止まる</td>
+    <td class="good">✓ 契約書用紙に記入</td>
+    <td class="bad">✗ 請求書用紙に無理やり記入<br>（金額の欄に契約金、期限の欄に契約終了日…）</td></tr>
+  <tr><td><strong>領収書</strong></td>
+    <td class="meh">△ たいてい領収書用紙に記入。<br>ときどき文章で返して止まる</td>
+    <td class="good">✓ 領収書用紙に記入</td>
+    <td class="bad">✗ 請求書用紙に無理やり記入</td></tr>
+  <tr class="total"><td><strong>まとめ</strong></td>
+    <td class="meh">△ たまに止まる</td>
+    <td class="good">✓ 毎回、種類に合った用紙で返る</td>
+    <td class="bad">✗ 形は整っているが、中身が間違う</td></tr>
+</table>
+</div>
+<p class="sub">用紙の英語名：請求書用紙＝<code>extract_invoice</code>、契約書用紙＝<code>extract_contract</code>、領収書用紙＝<code>extract_receipt</code></p>
+
+<h2><span class="n">4</span>どれを使うか：判断の早見表</h2>
+<div class="tbl">
+<table>
+  <tr><th>状況</th><th>tool_choice</th><th>例</th></tr>
+  <tr><td>ツールを使うかどうかも任せたい。普通に会話で答えてもいい</td><td><code>"auto"</code></td><td>カスタマーサポート（<code>labs/scenario1-no-mcp/agent.py</code>）。挨拶には文章で返し、注文の質問にはツールを使う</td></tr>
+  <tr><td>必ず構造化して返してほしい。ただし用紙の種類は文書次第</td><td><code>"any"</code></td><td><strong>6.2</strong>：種類のわからない文書の抽出</td></tr>
+  <tr><td>Claude に選ばせず、こちらが「この1枚」と決める</td><td><code>{"type": "tool", "name": "…"}</code></td><td>①種類がわかっている文書（「請求書アップロード」ボタンから来たものは必ず請求書）<br>②最初の一手を決めたい：1回目の呼び出しだけ <code>extract_metadata</code>（種類・日付・発行元などの抜き出し）を強制し、その結果を使う2段目（取引先DBで情報を足す等）が飛ばされないようにする</td></tr>
+</table>
+</div>
+
+<div class="note key"><strong>試験のサイン：</strong>「必ず構造化（会話の文章は禁止）」＋「どのスキーマかはモデルが選ぶ」→ <code>"any"</code>。「必ずこの処理を先に」→ 名前で指定。「使うかどうか任せる」→ <code>"auto"</code>。</div>
+
+<div class="note">公式ガイド Task Statement 4.3：<br>
+<em>The distinction between tool_choice: "auto" (model may return text instead of calling a tool), "any" (model must call a tool but can choose which), and forced tool selection (model must call a specific named tool)</em><br>
+tool_choice の違い：<code>"auto"</code>（ツールを呼ばずに文章を返すことがある）、<code>"any"</code>（必ずツールを呼ぶが、どれかは選べる）、ツールの強制指定（名前を指定した特定のツールを必ず呼ぶ）</div>
+</div>
