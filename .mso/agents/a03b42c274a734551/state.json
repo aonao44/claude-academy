@@ -1,0 +1,35 @@
+{
+  "loop_type": "eval",
+  "active": true,
+  "iteration": 0,
+  "max_iterations": 12,
+  "threshold": 70,
+  "started_at": 1790804180,
+  "max_wall_minutes": 360,
+  "ended_reason": null,
+  "session_id": "45af86f0-e781-4751-a7d4-b14f475f45ed",
+  "agent_id": "a03b42c274a734551",
+  "project_dir": "/Users/naokiaoki/dev/claude-academy",
+  "task": "",
+  "criteria": "",
+  "generator_skill": "assign-eval-loop-generator",
+  "evaluator_skill": "assign-eval-loop-evaluator",
+  "latest_score": null,
+  "evaluated_iteration": null,
+  "best_score": null,
+  "best_iteration": null,
+  "snapshot_enabled": true,
+  "snapshot_ref_prefix": "refs/eval-loop/45af86f0-e781-4751-a7d4-b14f475f45ed/a03b42c274a734551",
+  "turns_dir": "/Users/naokiaoki/dev/claude-academy/.mso/agents/a03b42c274a734551/turns",
+  "phase": "plan",
+  "latest_plan": null,
+  "write_targets": [],
+  "evaluator_history": [
+    {
+      "evaluator": "assign-eval-loop-evaluator",
+      "from_iteration": 0,
+      "to_iteration": null,
+      "reason": "initial"
+    }
+  ]
+}
