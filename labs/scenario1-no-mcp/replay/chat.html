@@ -90,7 +90,8 @@ body.nowhy .why { display: none; }
 #grip:hover::before, #grip.drag::before { background: var(--muted); }
 body.resizing { cursor: ns-resize; user-select: none; }
 #stack { padding: 8px 12px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center; font-size: 12px; border-bottom: 1px solid var(--line); }
-#stack .m { padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); }
+#stack .m { padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); cursor: pointer; }
+#stack .m:hover, #stack .m.sel { background: var(--line); }
 #stack .m.user { color: var(--front); } #stack .m.assistant { color: var(--api); }
 #json { margin: 0; padding: 10px 12px; overflow: auto; font: 12px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; word-break: break-all; }
 #jsonTitle { padding: 6px 12px 0; font-size: 12px; color: var(--muted); }
@@ -173,8 +174,13 @@ function draw(ev) {
     const sep = document.createElement("div"); sep.className = "turnsep"; sep.textContent = `── ${turn} 回目の API 呼び出し ──`;
     rows.appendChild(sep);
     $("#stack").innerHTML = "<b>messages：</b>" + ev.roles.map((r, i) =>
-      `<span class="m ${r.split("(")[0]}">${i + 1}. ${r}</span>`).join("→") +
-      `<span style="color:var(--muted);margin-left:6px">← この ${ev.roles.length} 件を毎回まるごと送る</span>`;
+      `<span class="m ${r.split("(")[0]}" data-i="${i}">${i + 1}. ${r}</span>`).join("→") +
+      `<span style="color:var(--muted);margin-left:6px">← この ${ev.roles.length} 件を毎回まるごと送る（クリックで中身）</span>`;
+    const msgs = (ev.json && ev.json.messages) || [];
+    $("#stack").querySelectorAll(".m").forEach(el => {
+      const i = +el.dataset.i;
+      el.onclick = () => select(el, { title: `messages[${i}]（${i + 1}件目）：${ev.roles[i]}`, json: msgs[i] });
+    });
   }
   if (ev.kind === "done") return finish(ev);
   if (ev.kind === "reply") addBubble("bot", ev.text || "（text なし）");
