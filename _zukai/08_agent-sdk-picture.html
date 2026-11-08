@@ -1,0 +1,205 @@
+<title>Agent SDK のサポートエージェント</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --sdk:#5b4bb3; --sdk-bg:#efecfb;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7; --ok:#2e7d32; --ok-bg:#e8f5e9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --sdk:#b2a6f5; --sdk-bg:#272140;
+    --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --sdk:#b2a6f5; --sdk-bg:#272140;
+  --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:920px;margin:0 auto;padding-inline:18px;padding-block:28px 60px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--mine);font-weight:700;margin:0 0 4px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 6px;padding-top:14px;border-top:1px solid var(--line);text-wrap:balance}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+p,li{font-size:14.5px}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+pre{background:var(--code-bg);border-radius:8px;padding:11px 13px;overflow-x:auto;margin:6px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.6}
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-top:12px;overflow-x:auto}
+.fig svg{display:block;min-width:680px;width:100%;height:auto}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+.tbl{overflow-x:auto}
+.steps{display:grid;gap:8px;margin-top:12px;counter-reset:s}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--card)}
+.step::before{counter-increment:s;content:counter(s);font-weight:700;color:var(--mine);font-variant-numeric:tabular-nums;font-size:15px}
+.step .who{font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;margin-right:6px}
+.who.app{background:var(--mine-bg);color:var(--mine)}
+.who.sdk{background:var(--sdk-bg);color:var(--sdk)}
+.who.api{background:var(--theirs-bg);color:var(--theirs)}
+.step p{margin:2px 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media (max-width:640px){.pair{grid-template-columns:1fr}}
+.box{border:1px solid var(--line);border-radius:8px;padding:10px 13px;background:var(--card)}
+.box.bad{border-color:var(--warn);background:var(--warn-bg)}
+.box.good{border-color:var(--ok);background:var(--ok-bg)}
+.box h3{margin:0 0 4px;font-size:15px}
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">シナリオ1 ・ Claude Agent SDK の全体像</p>
+  <h1>Agent SDK のサポートエージェント</h1>
+  <p class="lede">「Claude Agent SDK でカスタマーサポートのエージェントを作る」とは、何がどこにあって、何が誰の仕事なのか。返金1件の流れで追います。図の中のサーバー名やデータはすべて説明用の例です。</p>
+</header>
+
+<h2><span class="n">1</span>どこに何があるか</h2>
+<p>登場するのは3つの場所です。<b>あなたのサーバー</b>の中に、あなたのアプリと Agent SDK が同居しています。Claude は Anthropic 側にいて、データベースには一切触れません。</p>
+
+<div class="fig" role="img" aria-label="あなたのサーバーの中にアプリと Agent SDK があり、SDK が Anthropic API の Claude と、MCP サーバー経由でデータベースとやりとりする全体図">
+<svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- your server -->
+  <rect x="10" y="10" width="520" height="450" rx="12" style="fill:none;stroke:var(--mine);stroke-width:2;stroke-dasharray:6 4"/>
+  <text x="26" y="36" font-size="14" font-weight="700" style="fill:var(--mine)">あなたのサーバー（Python が動いている場所）</text>
+
+  <!-- app -->
+  <rect x="30" y="54" width="480" height="78" rx="10" style="fill:var(--mine-bg);stroke:var(--mine)"/>
+  <text x="46" y="80" font-size="14" font-weight="700" style="fill:var(--fg)">あなたのアプリ（あなたが書くコード）</text>
+  <text x="46" y="104" font-size="12.5" style="fill:var(--muted)">チャット画面から顧客の文を受け取り、query() に渡す</text>
+  <text x="46" y="123" font-size="12.5" style="fill:var(--muted)">設定：system・使うツール・サブエージェントの名簿・MCP サーバーの接続先</text>
+
+  <!-- sdk -->
+  <rect x="30" y="152" width="480" height="196" rx="10" style="fill:var(--sdk-bg);stroke:var(--sdk)"/>
+  <text x="46" y="178" font-size="14" font-weight="700" style="fill:var(--sdk)">Claude Agent SDK（Anthropic が配っている部品）</text>
+  <rect x="46" y="192" width="215" height="66" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="58" y="215" font-size="12.5" font-weight="700" style="fill:var(--fg)">ループ</text>
+  <text x="58" y="236" font-size="11.5" style="fill:var(--muted)">送る→tool_use を見る→実行→</text>
+  <text x="58" y="251" font-size="11.5" style="fill:var(--muted)">結果を返す、を end_turn まで</text>
+  <rect x="279" y="192" width="215" height="66" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="291" y="215" font-size="12.5" font-weight="700" style="fill:var(--fg)">組み込みツール</text>
+  <text x="291" y="236" font-size="11.5" style="fill:var(--muted)">Read・Write・Bash・Grep・Glob</text>
+  <text x="291" y="251" font-size="11.5" style="fill:var(--muted)">（中身を書かなくても使える）</text>
+  <rect x="46" y="270" width="215" height="66" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="58" y="293" font-size="12.5" font-weight="700" style="fill:var(--fg)">サブエージェント管理</text>
+  <text x="58" y="314" font-size="11.5" style="fill:var(--muted)">Agent（Task）ツールが呼ばれたら</text>
+  <text x="58" y="329" font-size="11.5" style="fill:var(--muted)">別の会話として起動する</text>
+  <rect x="279" y="270" width="215" height="66" rx="8" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="291" y="293" font-size="12.5" font-weight="700" style="fill:var(--fg)">フック</text>
+  <text x="291" y="314" font-size="11.5" style="fill:var(--muted)">ツール実行の前後に、あなたの</text>
+  <text x="291" y="329" font-size="11.5" style="fill:var(--muted)">チェック用コードを差し込む（1.3）</text>
+
+  <!-- mcp server -->
+  <rect x="30" y="368" width="480" height="78" rx="10" style="fill:var(--card);stroke:var(--mine)"/>
+  <text x="46" y="393" font-size="14" font-weight="700" style="fill:var(--fg)">MCP サーバー（あなたが作ったツールの置き場）</text>
+  <text x="46" y="416" font-size="12.5" style="fill:var(--mine)">get_customer ・ lookup_order ・ process_refund ・ escalate_to_human</text>
+  <text x="46" y="436" font-size="11.5" style="fill:var(--muted)">中で顧客DB・注文DB・決済システムを触る。ここが 1.6 の「エラーを返す側」</text>
+
+  <!-- arrows inside -->
+  <line x1="270" y1="132" x2="270" y2="148" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#a)"/>
+  <line x1="200" y1="348" x2="200" y2="364" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#a)"/>
+  <line x1="340" y1="364" x2="340" y2="348" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#a)"/>
+  <text x="208" y="361" font-size="10.5" style="fill:var(--muted)">実行して</text>
+  <text x="348" y="361" font-size="10.5" style="fill:var(--muted)">結果</text>
+
+  <!-- anthropic -->
+  <rect x="610" y="152" width="270" height="196" rx="12" style="fill:var(--theirs-bg);stroke:var(--theirs);stroke-width:2"/>
+  <text x="745" y="182" text-anchor="middle" font-size="14" font-weight="700" style="fill:var(--theirs)">Anthropic API</text>
+  <text x="745" y="214" text-anchor="middle" font-size="22" font-weight="700" style="fill:var(--fg)">Claude</text>
+  <text x="745" y="246" text-anchor="middle" font-size="12" style="fill:var(--muted)">考えて、返事をするだけ</text>
+  <text x="745" y="268" text-anchor="middle" font-size="12" style="fill:var(--muted)">ツールは実行しない</text>
+  <text x="745" y="290" text-anchor="middle" font-size="12" style="fill:var(--muted)">DB にも触れない</text>
+  <text x="745" y="312" text-anchor="middle" font-size="12" style="fill:var(--muted)">前回のことは覚えていない</text>
+
+  <!-- sdk <-> api -->
+  <line x1="510" y1="205" x2="604" y2="205" style="stroke:var(--sdk);stroke-width:2" marker-end="url(#a)"/>
+  <text x="557" y="196" text-anchor="middle" font-size="11" style="fill:var(--sdk)">system・tools・</text>
+  <text x="557" y="222" text-anchor="middle" font-size="11" style="fill:var(--sdk)">messages</text>
+  <line x1="604" y1="290" x2="510" y2="290" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#a)"/>
+  <text x="557" y="281" text-anchor="middle" font-size="11" style="fill:var(--theirs)">text か</text>
+  <text x="557" y="307" text-anchor="middle" font-size="11" style="fill:var(--theirs)">tool_use</text>
+</svg>
+</div>
+<div class="legend">
+  <span style="--c:var(--mine)">あなたが書く・作るもの</span>
+  <span style="--c:var(--sdk)">Agent SDK がやってくれること</span>
+  <span style="--c:var(--theirs)">Anthropic 側（Claude）</span>
+</div>
+
+<div class="note"><b>練習用コード <code>labs/scenario1-no-mcp/agent.py</code> との違い：</b>あちらは紫の部分（ループ・ツールの実行）を全部自分で書いていました。Agent SDK を使うと、紫の部分は SDK が受け持ち、あなたは緑の部分（設定とツールの中身）に集中できます。Claude 側の仕組みはどちらも同じです。</div>
+
+<h2><span class="n">2</span>返金1件の流れ</h2>
+<p>顧客「先週買った靴を返品して返金してほしい。メールは hanako@example.com です」（例）</p>
+
+<div class="steps">
+  <div class="step"><div><p><span class="who app">アプリ</span>顧客の文と設定を <code>query()</code> に渡す。</p></div></div>
+  <div class="step"><div><p><span class="who sdk">SDK</span>system・tools（4つの MCP ツール）・messages を Claude に送る。</p></div></div>
+  <div class="step"><div><p><span class="who api">Claude</span>「まず本人確認」と判断し、<code>tool_use: get_customer {email: "hanako@…"}</code> を返す。</p></div></div>
+  <div class="step"><div><p><span class="who sdk">SDK</span>MCP サーバーの get_customer を実行し、結果（顧客ID C-2044）を tool_result にして Claude に送り返す。</p></div></div>
+  <div class="step"><div><p><span class="who api">Claude</span>lookup_order → process_refund と、同じ往復を繰り返す。</p></div></div>
+  <div class="step"><div><p><span class="who sdk">SDK</span>process_refund を実行。<b>ここで返金が失敗したとする</b>（次の節）。</p></div></div>
+  <div class="step"><div><p><span class="who api">Claude</span>失敗の中身を読んで、次の手を決める。最後は文章だけを返す（stop_reason: end_turn）。</p></div></div>
+  <div class="step"><div><p><span class="who sdk">SDK</span>ループを終え、最終回答をアプリに返す。<span class="who app">アプリ</span>それを顧客に表示する。</p></div></div>
+</div>
+
+<h2><span class="n">3</span>失敗をどう返すか（問題 1.6）</h2>
+<p>6番目で process_refund が失敗したとき、MCP サーバー（あなたのコード）が返す tool_result の中身で、Claude の次の一手が変わります。<b>Claude は、渡された文字しか見られません</b>（原則④）。</p>
+
+<div class="pair">
+  <div class="box bad">
+    <h3>今：理由が分からない</h3>
+<pre>tool_result:
+"Operation failed."</pre>
+    <p>決済システムの一時停止でも、返品期限切れでも、同じ文字列。Claude には区別がつかないので、方針で禁止された返金をやり直したり、少し待てば通る障害で諦めたりする。</p>
+  </div>
+  <div class="box good">
+    <h3>D：理由と次の手が分かる</h3>
+<pre>tool_result:
+{ "errorCategory": "business",
+  "isRetryable": false,
+  "description": "返品期限（30日）を
+    過ぎているため返金できません" }</pre>
+    <p>Claude は「やり直しても無駄。顧客に期限切れを説明しよう」と判断できる。</p>
+  </div>
+</div>
+
+<div class="tbl"><table>
+  <tr><th>errorCategory</th><th>例</th><th>isRetryable</th><th>Claude の正しい動き</th></tr>
+  <tr><td>transient（一時的）</td><td>決済システムが30秒止まっていた</td><td>true</td><td>少し待ってやり直す</td></tr>
+  <tr><td>validation（入力の誤り）</td><td>注文番号の形式が違う</td><td>false（直してからなら可）</td><td>入力を直して呼び直す</td></tr>
+  <tr><td>business（業務ルール違反）</td><td>返品期限切れ、500ドル超</td><td>false</td><td>顧客に理由を説明する／人間に回す</td></tr>
+  <tr><td>permission（権限なし）</td><td>このエージェントには返金の権限がない</td><td>false</td><td>人間に回す</td></tr>
+</table></div>
+
+<h2><span class="n">4</span>言葉の整理</h2>
+<div class="tbl"><table>
+  <tr><th>言葉</th><th>何か</th><th>図のどこ</th></tr>
+  <tr><td>Claude Agent SDK</td><td>エージェントのループ・ツール実行・サブエージェントなどを肩代わりしてくれる Python（や TypeScript）の部品</td><td>紫の箱</td></tr>
+  <tr><td>MCP（Model Context Protocol）</td><td>ツールを「サーバー」として外に置き、決まった方式でつなぐための約束事</td><td>下の箱とその矢印</td></tr>
+  <tr><td>カスタム MCP ツール</td><td>シナリオの「あなた」が自社のために作ったツール。get_customer など</td><td>下の箱の中身</td></tr>
+  <tr><td>組み込みツール</td><td>SDK に最初から入っているツール。シナリオ1では使わない</td><td>紫の箱の右上</td></tr>
+  <tr><td>resolution agent</td><td>質問に答えるだけでなく、問題を<b>解決まで</b>持っていくエージェント</td><td>全体</td></tr>
+</table></div>
+</div>

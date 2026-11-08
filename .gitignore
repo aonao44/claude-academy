@@ -1,3 +1,26 @@
 .DS_Store
 .venv/
 __pycache__/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+
+# 再配布不可の第三者資料。入手先は README 参照
+CCAR-F.pdf
+guide_ja.pdf
+CCAR-F-exam-guide-official.pdf
+
+# 個人情報・先方の会社情報。GitHub には上げない
+PRIVATE.md
+
+# 環境変数・シークレット（API キー等）
+.env
+.env.*
+.envrc
+!.env.example
+
+# labs の実行トレース（trace_run.py が毎回生成する）
+labs/*/traces/

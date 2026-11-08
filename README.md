@@ -1,6 +1,6 @@
 # claude-academy
 
-Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社（2027/4）までのインプットを回すプロジェクト。
+Claude 認定試験（Anthropic 公式）の取得と、転職先での実務に向けたインプットを回すプロジェクト。
 
 **→ 何をすべきか・順番・URL は `学習プラン.md`。教材カタログは `教材.md`。ここは事実と未確認事項の置き場。**
 
@@ -17,11 +17,12 @@ Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社�
 
 ## 背景
 
-- 2027年4月 入社予定先 入社予定（FDE / （職位））。入社日は先方が上長相談中、（手続き中）
-- 先方から「Claude 認定試験」「OpenAI 社の FDE 試験」の受験を要請された
-- 先方の期待は「（上位職位）まで早期に」
-- 入社予定先 は「Anthropic の認定パートナーになりたい」と言っている
+- 2027年春に FDE（Forward Deployed Engineer）として入社予定
+- 入社予定先から「Claude 認定試験」「OpenAI 社の FDE 試験」の受験を要請された
+- 入社予定先は Anthropic の認定パートナーを目指している
   → 受験させられる＝**CPN には加盟済みと考えるのが自然**（組織ドメインのメールがないと登録すらできない制度のため）
+
+> 入社予定先の固有情報・自分の待遇・未確認事項はリポジトリに含めない（ローカルの `PRIVATE.md`）。
 
 ## 公式の入口（ログイン不要で閲覧できる）
 
@@ -75,7 +76,7 @@ Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社�
    - ただし**学習コース（Claude Academy）は日本語対応済み**（2026年8月公開）
    - 120分で60問＝1問2分。**英語の読解速度が合否を分ける**（受験記3件が一致）
 2. **受験には Claude Partner Network 加盟組織のドメインメールが必須。** 個人 Gmail では登録不可
-   - → **入社予定先 入社後（2027年4月〜）、かつ 入社予定先 が加盟していることが前提**
+   - → **入社後、かつ入社予定先が加盟していることが前提**
 
 ### Claude Partner Network の Tier 要件（Services Track）
 
@@ -89,20 +90,24 @@ Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社�
 
 - **Active 判定には「有効な対象資格を持ち、かつ直近90日以内に Claude を利用している」が含まれる。**
   取って使わない人はカウントされない → Claude Code を日常的に使っている自分は自動的に満たす
-- 入社予定先 は公開顧客事例（（事例あり））を既に満たしており、
-  **残っているのは認定者10人**。自分はその枠の1人
+- 入社予定先は公開顧客事例の要件を既に満たしており、**残っているのは認定者10人**。自分はその枠の1人
 
-## 手元の資産（正体を確認済み）
+## 手元の資産（PDF はリポジトリに含まない）
 
-| ファイル | 正体 |
-|---|---|
-| `CCAR-F.pdf` | **Matthew Purcell 氏の予想問題集 60問**（"Written following Exam Guide v1.0 (July 2026)"）。**公式ではない** |
-| `guide_ja.pdf` | **paullarionov 氏の非公式日本語学習ガイド 92ページ**。**公式ではない**（公式は英語のみなので多言語版は存在しない） |
-| （欠けているもの） | **公式 Exam Guide** ← Skilljar の「Download the exam guide」から取る。`学習プラン.md` STEP 0 |
+**この3点は第三者の著作物なので、リポジトリには入れていない**（`.gitignore` 済み）。
+各自で下記から取得し、リポジトリ直下にこのファイル名で置くと、本文中の参照が繋がる。
+
+| ファイル名 | 正体 | 入手先 |
+|---|---|---|
+| `CCAR-F-exam-guide-official.pdf` | **公式 Exam Guide v1.0（39ページ）。範囲を定義している唯一の一次資料** | [認定ページ](https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification) の「Download the exam guide」（ログイン不要） |
+| `guide_ja.pdf` | paullarionov 氏の非公式日本語学習ガイド 92ページ。**配点は公式と完全一致**し、構成も公式ブループリント準拠。**公式ではない** | [paullarionov/claude-certified-architect](https://github.com/paullarionov/claude-certified-architect) の `pdf/guide_ja.pdf` |
+| `CCAR-F.pdf` | Matthew Purcell 氏の予想問題集 60問（"Written following Exam Guide v1.0 (July 2026)"）。**公式ではない** | 著者の配布元から各自取得 |
+
+**公式は英語のみ。** 日本語試験は未提供で、多言語版の公式資料は存在しない。
 
 ## OpenAI 側（参考・当面動かせない）
 
-- 先方の言う「OpenAI の FDE 試験」は **OpenAI Partner Network 内の Forward Deployed Experts** とみられる
+- 要請された「OpenAI の FDE 試験」は **OpenAI Partner Network 内の Forward Deployed Experts** とみられる
 - **公式記述で確認**：複雑な企業導入に取り組むパートナー向けに、**創設パートナーの一部と試験運用中**。
   適格なパートナー実務者が OpenAI の Forward Deployed Engineering チームと連携できるようにするもの。
   参加者は OpenAI の技術・プレイブック・変革パターンに触れられる
@@ -110,38 +115,30 @@ Claude 認定試験（Anthropic 公式）の取得と、入社予定先 入社�
 - 別に**認定コンサルタント**の制度がある（2026年末までに30万人育成が目標、$1.5億ドル投資）。
   こちらは試験。**ティアは Select / Advanced / Elite の3段階**、
   **スペシャライゼーションは Codex / サイバーセキュリティ / エージェント**
-- **（国内某社） が OpenAI Partner Network の公式パートナー一覧に掲載**されている
-  （日本勢は他に Dentsu Japan / Fujitsu / NTT DATA / teamLab / Recursive）
-- （省略）
+- OpenAI Partner Network の公式パートナー一覧には日本勢も複数掲載されている
 - **試験言語の記載は公開情報になし。** 詳細はパートナーポータル（要ログイン）の中
 - **「相当難しい」の裏付けは存在しない**（フル試験が一般稼働していないため合格率も体験談もない）
 - 今すぐ取れるのは **OpenAI Academy の無料コース**（academy.openai.com。**ただし英語のみ・UIに言語切替なし**）
   - 公式が「バッジ・修了証は資格ではない」と明記
 
-## 未確認事項（入社予定先 に聞く）
+## 未確認事項
 
-- [ ] 入社予定先 は **Claude Partner Network** に加盟しているか（**外部からは確認不可**。Anthropic に公開パートナーディレクトリがない）。パートナー用メールを発行してもらえるか
-- [ ] 先方が指しているのは 4種のうちどれか。**ティア要件で今どれが足りていないか**
-- [ ] 受験費用（$99〜$175）は会社負担か。パートナー階層の50%割引は適用されるか
-- [ ] 入社予定先 は **OpenAI Partner Network** に加盟しているか。tier は Select 以上か
-- [ ] OpenAI 側は **認定コンサルタントの試験**か、**Forward Deployed Experts プログラム**か
-- [ ] **Anthropic 側と OpenAI 側、会社としてどちらが優先か**（両方本気なら準備量が倍）
-- [ ] 入社日の確定（（手続き中））
+入社予定先に確認すべき事項（加盟状況・費用負担・優先度・入社日など）は
+ローカルの `PRIVATE.md` に置き、beads の `claude-academy-256` で追跡している。
+
 
 ## 次の一手
 
 1. **`学習プラン.md` STEP 0** — 公式 Exam Guide を Skilljar から入手する（30分）
 2. **STEP 1** — 公式サンプル問題12問 → Purcell v2（60問）を120分計って解き、**ドメイン別に自己採点**
 3. 75%を切ったドメインのコースだけ受ける（STEP 2）
-4. 上記の未確認事項を、入社予定先 への議事メモに含めて送る
+4. 未確認事項（`PRIVATE.md`）を入社予定先への議事メモに含めて送る
 
 ## 関連
 
-- `~/dev/prep` — 入社予定先 入社前の技術キャッチアップ（labs/ のハンズオン、Git、Terraform、RAG+eval、
-  入社予定先 の実スタック調査）。**CCAR-F の手を動かす部分は `prep/labs/04・03・05`**
-- `~/dev/agentcore-a2a-study` — Bedrock AgentCore マルチエージェント PoC（CDK）。
-  **CCAR-F シナリオ③にそのまま対応する既存資産**
-- `~/dev/rag-tool-langgraph-poc` — LangGraph + Agentic RAG の PoC。**未コミット・未完成**
-  - 構成：ingest（Chroma へ埋め込み）→ rag（RAG単体）→ agent_graph（agent↔tools ループ）
-  - **これを完成させると、OpenAI 系 FDE 求人の唯一の未充足要件が埋まる**
-    （`OAI_FDE_JD`：LangChain/LangGraph/LlamaIndex を使った RAG 実装経験）
+手元の関連リポジトリ（RAG+eval のハンズオン、Bedrock AgentCore のマルチエージェント PoC、
+LangGraph + Agentic RAG の PoC）との対応は `PRIVATE.md` に記載。
+
+- `labs/scenario1-no-mcp/` — CCAR-F シナリオ1（カスタマーサポートエージェント）を MCP 抜きで実装
+- `labs/scenario1-mcp/` — 同シナリオの MCP 版（未実装）
+- `_zukai/` — エージェントの全体像とシナリオ1の解剖（図解 HTML）

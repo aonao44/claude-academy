@@ -1,0 +1,5 @@
+out/
+work/
+public/audio/
+public/timeline*.json
+.DS_Store

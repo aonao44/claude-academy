@@ -1,0 +1,241 @@
+<title>視覚芸術しか残らないレポート</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7; --ok:#2e7d32; --ok-bg:#e8f5e9;
+  --ghost:#b9b3aa;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+    --ghost:#5a5664;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+  --ghost:#5a5664;
+}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:900px;margin:0 auto;padding-inline:18px;padding-block:28px 60px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--mine);font-weight:700;margin:0 0 4px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 6px;padding-top:14px;border-top:1px solid var(--line);text-wrap:balance}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+p,li{font-size:14.5px}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+
+/* 長文の分解 */
+.chunks{display:grid;gap:10px;margin-top:12px}
+.chunk{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:start;
+  border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--card)}
+.tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 0;text-align:center}
+.tag.ctx{background:var(--code-bg);color:var(--muted)}
+.tag.ev{background:var(--ok-bg);color:var(--ok)}
+.tag.sym{background:var(--warn-bg);color:var(--warn)}
+.tag.key{background:var(--mine-bg);color:var(--mine)}
+.tag.q{background:var(--theirs-bg);color:var(--theirs)}
+.en{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.6}
+.ja{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.en b{color:var(--fg);background:var(--code-bg);padding:0 .15em;border-radius:3px}
+@media (max-width:520px){.chunk{grid-template-columns:1fr}.tag{justify-self:start;padding:2px 10px}}
+
+/* 図 */
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-top:12px;overflow-x:auto}
+.fig svg{display:block;min-width:640px;width:100%;height:auto}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+/* 選択肢 */
+.opts{display:grid;gap:10px;margin-top:12px}
+.opt{border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:var(--card)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt h3{margin:0 0 4px;font-size:15px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.opt h3 .who{font-size:12.5px;font-weight:600;color:var(--muted)}
+.opt .en{font-size:12.5px}
+.why{margin:8px 0 0;font-size:14px}
+.why b{color:var(--warn)}
+.opt.right .why b{color:var(--ok)}
+
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+.tbl{overflow-x:auto}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">公式サンプル Q7 ・ シナリオ3 マルチエージェント調査 ・ ドメイン1（Task Statement 1.2）</p>
+  <h1>視覚芸術しか残らないレポート</h1>
+  <p class="lede">長い問題文を役割ごとに分け、どこで分野が消えたかを1枚の図で追います。正解は B（コーディネーターの分解が狭すぎる）。</p>
+</header>
+
+<h2><span class="n">1</span>長い問題文は5つの役割に分けて読む</h2>
+<p>問題文は長くても、中身は「状況・証拠・症状・設問」の組み合わせです。緑の<b>証拠</b>が選択肢を消す材料になります。</p>
+
+<div class="chunks">
+  <div class="chunk"><span class="tag ctx">状況</span><div>
+    <p class="en">After running the system on the topic "impact of AI on creative industries,"</p>
+    <p class="ja">「AI がクリエイティブ産業に与える影響」というテーマでシステムを動かした。</p></div></div>
+  <div class="chunk"><span class="tag ev">証拠①</span><div>
+    <p class="en">you observe that <b>each subagent completes successfully</b>: the web search agent finds relevant articles, the document analysis agent summarizes papers correctly, and the synthesis agent produces coherent output.</p>
+    <p class="ja">サブエージェントはどれも正常に完了した。検索担当は関連記事を見つけ、分析担当は論文を正しく要約し、まとめ担当は筋の通った出力を作った。<br>→ <b>下流の3担当は無実</b>。A・C・D がここで消える。</p></div></div>
+  <div class="chunk"><span class="tag sym">症状</span><div>
+    <p class="en">However, the final reports cover <b>only visual arts</b>, completely missing music, writing, and film production.</p>
+    <p class="ja">ところが最終レポートは視覚芸術だけで、音楽・執筆・映画制作がまるごと抜けている。</p></div></div>
+  <div class="chunk"><span class="tag key">証拠②</span><div>
+    <p class="en">When you examine <b>the coordinator's logs</b>, you see it <b>decomposed</b> the topic into three subtasks: "AI in digital art creation," "AI in graphic design," and "AI in photography."</p>
+    <p class="ja">コーディネーターのログを見ると、テーマを「デジタルアート」「グラフィックデザイン」「写真」の3つに分解していた。<br>→ 3つとも視覚芸術。<b>最初の割り振りの時点で</b>音楽・執筆・映画が消えている。</p></div></div>
+  <div class="chunk"><span class="tag q">設問</span><div>
+    <p class="en">What is the most likely <b>root cause</b>?</p>
+    <p class="ja">最も可能性の高い根本原因はどれか？ → 症状の対策ではなく、<b>最初に壊れた場所</b>を答える。</p></div></div>
+</div>
+
+<div class="note">長文のコツ：<b>最後の一文（設問）を先に読む</b>。「root cause を聞かれている」と分かってから本文を読むと、証拠を探す目で読めます。</div>
+
+<h2><span class="n">2</span>どこで分野が消えたか</h2>
+<p>左から右へ仕事が流れます。灰色の点線が「割り振られなかったので誰も調べていない」分野です。</p>
+
+<div class="fig" role="img" aria-label="テーマ、コーディネーター、3つのサブエージェント、レポートの流れ。コーディネーターの時点で音楽・執筆・映画が落ち、以降の担当はすべて正常に動いている。">
+<svg viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/>
+    </marker>
+  </defs>
+
+  <!-- column labels -->
+  <text x="80" y="24" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--muted)">テーマ</text>
+  <text x="275" y="24" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--muted)">コーディネーターの分解</text>
+  <text x="530" y="24" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--muted)">サブエージェント</text>
+  <text x="770" y="24" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--muted)">レポート</text>
+
+  <!-- theme: creative industries -->
+  <rect x="10" y="44" width="140" height="330" rx="10" style="fill:var(--code-bg);stroke:var(--line)"/>
+  <text x="80" y="68" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--fg)">クリエイティブ産業</text>
+  <rect x="22" y="84" width="116" height="118" rx="8" style="fill:var(--mine-bg);stroke:var(--mine)"/>
+  <text x="80" y="104" text-anchor="middle" font-size="12.5" font-weight="700" style="fill:var(--mine)">視覚芸術</text>
+  <text x="80" y="128" text-anchor="middle" font-size="12" style="fill:var(--fg)">デジタルアート</text>
+  <text x="80" y="152" text-anchor="middle" font-size="12" style="fill:var(--fg)">グラフィック</text>
+  <text x="80" y="176" text-anchor="middle" font-size="12" style="fill:var(--fg)">写真</text>
+  <rect x="22" y="218" width="116" height="40" rx="8" style="fill:var(--card);stroke:var(--ghost);stroke-dasharray:4 3"/>
+  <text x="80" y="243" text-anchor="middle" font-size="12.5" style="fill:var(--muted)">音楽</text>
+  <rect x="22" y="268" width="116" height="40" rx="8" style="fill:var(--card);stroke:var(--ghost);stroke-dasharray:4 3"/>
+  <text x="80" y="293" text-anchor="middle" font-size="12.5" style="fill:var(--muted)">執筆</text>
+  <rect x="22" y="318" width="116" height="40" rx="8" style="fill:var(--card);stroke:var(--ghost);stroke-dasharray:4 3"/>
+  <text x="80" y="343" text-anchor="middle" font-size="12.5" style="fill:var(--muted)">映画制作</text>
+
+  <!-- coordinator -->
+  <rect x="200" y="84" width="150" height="118" rx="10" style="fill:var(--warn-bg);stroke:var(--warn);stroke-width:2"/>
+  <text x="275" y="106" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--warn)">コーディネーター</text>
+  <text x="275" y="130" text-anchor="middle" font-size="12" style="fill:var(--fg)">① デジタルアート</text>
+  <text x="275" y="152" text-anchor="middle" font-size="12" style="fill:var(--fg)">② グラフィック</text>
+  <text x="275" y="174" text-anchor="middle" font-size="12" style="fill:var(--fg)">③ 写真</text>
+  <text x="275" y="194" text-anchor="middle" font-size="11" style="fill:var(--muted)">（ログに残っている）</text>
+
+  <!-- arrows theme -> coordinator -->
+  <line x1="138" y1="143" x2="196" y2="143" style="stroke:var(--mine);stroke-width:2" marker-end="url(#ar)"/>
+  <!-- dropped fields -->
+  <line x1="138" y1="238" x2="196" y2="238" style="stroke:var(--ghost);stroke-width:1.5;stroke-dasharray:4 3"/>
+  <line x1="138" y1="288" x2="196" y2="288" style="stroke:var(--ghost);stroke-width:1.5;stroke-dasharray:4 3"/>
+  <line x1="138" y1="338" x2="196" y2="338" style="stroke:var(--ghost);stroke-width:1.5;stroke-dasharray:4 3"/>
+  <text x="202" y="242" font-size="15" font-weight="700" style="fill:var(--warn)">×</text>
+  <text x="202" y="292" font-size="15" font-weight="700" style="fill:var(--warn)">×</text>
+  <text x="202" y="342" font-size="15" font-weight="700" style="fill:var(--warn)">×</text>
+  <text x="222" y="280" font-size="12" style="fill:var(--warn)">割り振られず</text>
+  <text x="222" y="298" font-size="12" style="fill:var(--warn)">ここで消えた</text>
+
+  <!-- root cause badge -->
+  <rect x="222" y="48" width="106" height="24" rx="12" style="fill:var(--warn)"/>
+  <text x="275" y="65" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--bg)">B ＝ 根本原因</text>
+
+  <!-- subagents -->
+  <rect x="420" y="60" width="220" height="62" rx="9" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="434" y="84" font-size="12.5" font-weight="700" style="fill:var(--fg)">検索担当</text>
+  <text x="434" y="106" font-size="11.5" style="fill:var(--muted)">頼まれた3分野を検索</text>
+  <text x="626" y="84" text-anchor="end" font-size="12" font-weight="700" style="fill:var(--ok)">✓ 正常</text>
+  <text x="626" y="106" text-anchor="end" font-size="11.5" font-weight="700" style="fill:var(--theirs)">C</text>
+
+  <rect x="420" y="140" width="220" height="62" rx="9" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="434" y="164" font-size="12.5" font-weight="700" style="fill:var(--fg)">分析担当</text>
+  <text x="434" y="186" font-size="11.5" style="fill:var(--muted)">届いた論文を要約</text>
+  <text x="626" y="164" text-anchor="end" font-size="12" font-weight="700" style="fill:var(--ok)">✓ 正常</text>
+  <text x="626" y="186" text-anchor="end" font-size="11.5" font-weight="700" style="fill:var(--theirs)">D</text>
+
+  <rect x="420" y="220" width="220" height="62" rx="9" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="434" y="244" font-size="12.5" font-weight="700" style="fill:var(--fg)">まとめ担当</text>
+  <text x="434" y="266" font-size="11.5" style="fill:var(--muted)">届いた結果をまとめる</text>
+  <text x="626" y="244" text-anchor="end" font-size="12" font-weight="700" style="fill:var(--ok)">✓ 正常</text>
+  <text x="626" y="266" text-anchor="end" font-size="11.5" font-weight="700" style="fill:var(--theirs)">A</text>
+
+  <!-- coordinator -> subagents -->
+  <path d="M350,120 C385,120 385,91 416,91" style="fill:none;stroke:var(--muted);stroke-width:1.5" marker-end="url(#ar)"/>
+  <line x1="530" y1="122" x2="530" y2="136" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#ar)"/>
+  <line x1="530" y1="202" x2="530" y2="216" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#ar)"/>
+  <text x="420" y="316" font-size="11.5" style="fill:var(--muted)">どの担当も「視覚芸術の3分野」しか</text>
+  <text x="420" y="334" font-size="11.5" style="fill:var(--muted)">受け取っていない。受け取った分は正しく処理した。</text>
+
+  <!-- report -->
+  <line x1="640" y1="251" x2="696" y2="251" style="stroke:var(--muted);stroke-width:1.5" marker-end="url(#ar)"/>
+  <rect x="700" y="200" width="140" height="104" rx="9" style="fill:var(--card);stroke:var(--line)"/>
+  <text x="770" y="224" text-anchor="middle" font-size="12.5" font-weight="700" style="fill:var(--fg)">最終レポート</text>
+  <text x="770" y="248" text-anchor="middle" font-size="12" style="fill:var(--mine)">視覚芸術 ✓</text>
+  <text x="770" y="270" text-anchor="middle" font-size="12" style="fill:var(--muted)">音楽・執筆・映画</text>
+  <text x="770" y="290" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--warn)">なし（症状）</text>
+</svg>
+</div>
+<div class="legend">
+  <span style="--c:var(--warn)">壊れた場所（根本原因）</span>
+  <span style="--c:var(--ok)">正常に動いた（問題文が明言）</span>
+  <span style="--c:var(--ghost)">誰にも割り振られなかった分野</span>
+  <span style="--c:var(--theirs)">各選択肢が疑っている場所</span>
+</div>
+
+<h2><span class="n">3</span>選択肢を図の上に置く</h2>
+<p>A・C・D はどれも、図で「✓ 正常」の箱を疑っています。問題文の証拠①がその箱を無実だと言っているので、残るのは B だけです。</p>
+
+<div class="opts">
+  <div class="opt"><h3>A <span class="who">まとめ担当を疑う</span></h3>
+    <p class="en">The synthesis agent lacks instructions for identifying coverage gaps in the findings it receives from other agents.</p>
+    <p class="ja">まとめ担当には、他のエージェントから受け取った結果の抜け漏れを見つける指示がない。</p>
+    <p class="why"><b>✗</b> 音楽の資料はそもそも届いていない。抜けを見つける指示は有効な対策だが、症状を後で拾うもので、原因は直らない。</p></div>
+  <div class="opt right"><h3>B <span class="who">コーディネーターを疑う</span></h3>
+    <p class="en">The coordinator agent's task decomposition is too narrow, resulting in subagent assignments that don't cover all relevant domains of the topic.</p>
+    <p class="ja">コーディネーターのタスク分解が狭すぎる。その結果、サブエージェントへの割り振りがテーマの関連分野をすべてカバーしていない。</p>
+    <p class="why"><b>✓ 正解</b> 証拠②（ログ）がそのまま示している。分野が消えたのは最初の割り振り。</p></div>
+  <div class="opt"><h3>C <span class="who">検索担当を疑う</span></h3>
+    <p class="en">The web search agent's queries are not comprehensive enough and need to be expanded to cover more creative industry sectors.</p>
+    <p class="ja">検索担当のクエリが網羅的でなく、もっと多くの分野をカバーするよう広げる必要がある。</p>
+    <p class="why"><b>✗</b> 検索担当は「写真における AI」を頼まれ、そのとおり検索した。頼まれていない音楽を検索しないのは正しい動き。</p></div>
+  <div class="opt"><h3>D <span class="who">分析担当を疑う</span></h3>
+    <p class="en">The document analysis agent is filtering out sources related to non-visual creative industries due to overly restrictive relevance criteria.</p>
+    <p class="ja">分析担当が、関連性の基準が厳しすぎるせいで、視覚以外の分野の資料を除外している。</p>
+    <p class="why"><b>✗</b> 問題文は「正しく要約した」と言っている。資料を捨てた証拠はない。</p></div>
+</div>
+
+<h2><span class="n">4</span>直すならどこを直すか</h2>
+<p>試験が聞いているのは「どこが壊れたか」までです。直し方は公式ガイド 1.2 に2通り出てきます。</p>
+<div class="tbl"><table>
+  <tr><th>直し方</th><th>中身</th></tr>
+  <tr><td>コーディネーターの指示を直す</td><td>割り振る前に、テーマに含まれる分野を全部挙げさせてから分けさせる。</td></tr>
+  <tr><td>反復改善ループを足す</td><td>まとめの結果をコーディネーターが見直し、抜けた分野があれば検索担当と分析担当に追加で調べさせる。カバーが十分になるまで繰り返す。</td></tr>
+</table></div>
+
+<div class="note">公式ガイド 1.2 の一文がほぼ B と同じ文面です。<br>
+<code>Risks of overly narrow task decomposition by the coordinator, leading to incomplete coverage of broad research topics</code><br>
+コーディネーターのタスク分解が狭すぎると、幅広い調査テーマのカバーが不完全になる、というリスク。</div>
+
+</div>

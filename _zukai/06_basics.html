@@ -1,0 +1,309 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前提知識の基礎</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --val:#6b6760; --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7; --ok:#2e7d32; --ok-bg:#e8f5e9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --val:#a9a4b3; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --val:#a9a4b3; --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18; --ok:#81c784; --ok-bg:#12331a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:1000px;margin:0 auto;padding-block:24px;padding-inline:16px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 4px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:12px}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+h2 .need{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:3px}
+.need.must{background:var(--warn-bg);color:var(--warn)}
+.need.plus{background:var(--mine-bg);color:var(--mine)}
+h3{font-size:15.5px;margin:20px 0 4px}
+p,li{font-size:14.5px}
+p{max-width:76ch}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+pre{background:var(--code-bg);border-radius:8px;padding:11px 13px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65}
+pre code{background:none;padding:0}
+.a{color:var(--theirs);font-weight:650}
+.m{color:var(--mine);font-weight:650}
+.v{color:var(--val);font-style:italic}
+.c{color:var(--muted);font-style:italic}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600;white-space:nowrap}
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px}
+.note.warn{border-color:var(--warn);background:var(--warn-bg)}
+.note.api{border-color:var(--theirs);background:var(--theirs-bg)}
+.note p{margin:0;max-width:none}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.toc a{font-size:13px;text-decoration:none;color:var(--fg);border:1px solid var(--line);
+  background:var(--card);border-radius:999px;padding:3px 11px}
+.toc a:hover{border-color:var(--mine);color:var(--mine)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px;margin:12px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px}
+.box h3{margin-top:2px}
+figure{margin:12px 0;padding:10px 8px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.scroll{overflow-x:auto}
+svg.diagram{display:block;width:100%;min-width:660px;height:auto}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:6px;padding:0 4px}
+.t-lab{font-size:13px;font-weight:650}
+.t-mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+.lab{font-size:13px;color:var(--muted);margin:8px 0 0}
+.lab code{font-size:12px}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>前提知識の基礎</h1>
+  <p class="lede">ドメイン1（エージェント設計）を読むのに必要な土台だけを、<code>labs/scenario1-no-mcp/</code> の実物と結び付けてまとめたもの。<span class="need must">必須</span>は、これが無いと問題文が読めないもの。<span class="need plus">加点</span>は、あると理解が速いもの。</p>
+  <div class="toc">
+    <a href="#s1">01 JSON</a><a href="#s2">02 配列と辞書</a><a href="#s3">03 HTTP</a>
+    <a href="#s4">04 Python</a><a href="#s5">05 ステートレス</a><a href="#s6">06 JSON Schema</a>
+    <a href="#s7">07 トークン</a><a href="#s8">08 SDK</a><a href="#s9">09 用語</a>
+  </div>
+</header>
+
+<!-- 01 -->
+<h2 id="s1"><span class="n">01</span>JSON<span class="need must">必須</span></h2>
+<p>Claude とのやりとりは全部 JSON。<strong>読めればいい</strong>。書き方の規則は3つだけ。</p>
+<div class="two">
+  <div class="box"><h3>{ } オブジェクト … 名前で引く</h3>
+<pre><code>{
+  <span class="a">"stop_reason"</span>: <span class="a">"tool_use"</span>,
+  <span class="a">"role"</span>: <span class="a">"assistant"</span>
+}</code></pre>
+  <p style="font-size:13.5px;margin:6px 0 0">「キー: 値」の集まり。順番に意味はなく、名前で取り出す。</p></div>
+  <div class="box"><h3>[ ] 配列 … 順番に並ぶ</h3>
+<pre><code>[
+  {<span class="a">"type"</span>: <span class="a">"text"</span>, …},
+  {<span class="a">"type"</span>: <span class="a">"tool_use"</span>, …}
+]</code></pre>
+  <p style="font-size:13.5px;margin:6px 0 0">同じ種類のものが0個以上並ぶ。<strong>1個とは限らない</strong>のが要点。</p></div>
+</div>
+<h3>値の型</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>型</th><th>書き方</th><th>API での例</th></tr></thead>
+<tbody>
+<tr><td>文字列</td><td><code>"tool_use"</code>（必ず二重引用符）</td><td><code class="a">stop_reason</code> の値</td></tr>
+<tr><td>数値</td><td><code>700</code>（引用符なし）</td><td><code class="a">max_tokens</code></td></tr>
+<tr><td>真偽値</td><td><code>true</code> / <code>false</code>（小文字）</td><td><code class="a">is_error</code></td></tr>
+<tr><td>null</td><td><code>null</code></td><td><code class="a">stop_details</code>（拒否以外のとき）</td></tr>
+<tr><td>入れ子</td><td><code>{ }</code> や <code>[ ]</code> の中にまた <code>{ }</code></td><td><code class="a">content</code> の中の各ブロック</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note warn"><p><strong>引用符の有無は意味が違う。</strong><code>"700"</code>（文字列）と <code>700</code>（数値）は別物。<code>"true"</code> と <code>true</code> も別物。API がエラーを返す典型。</p></div>
+<p class="lab">実物で見る → <a href="04_trace-replay.html">04 やりとり再生</a> の右パネル。送った JSON と返ってきた JSON がそのまま出ている。</p>
+
+<!-- 02 -->
+<h2 id="s2"><span class="n">02</span>「配列」と「単一の値」の区別<span class="need must">必須</span></h2>
+<p>試験でもっとも効く区別。<strong>1つしか入らない場所と、複数入る場所がある。</strong></p>
+<div class="tbl">
+<table>
+<thead><tr><th>フィールド</th><th>形</th><th>中身</th><th>コードの書き方</th></tr></thead>
+<tbody>
+<tr><td><code class="a">stop_reason</code></td><td><strong>単一の文字列</strong></td><td>6つの候補から1つだけ</td><td><code>if res.stop_reason == "tool_use":</code></td></tr>
+<tr><td><code class="a">content</code></td><td><strong>配列</strong></td><td>ブロックが1個以上</td><td><code>for b in res.content:</code></td></tr>
+<tr><td><code class="a">messages</code></td><td><strong>配列</strong></td><td>会話の全履歴</td><td><code>messages.append(...)</code></td></tr>
+<tr><td><code class="a">tools</code></td><td><strong>配列</strong></td><td>ツール定義が複数</td><td>—</td></tr>
+<tr><td><code class="a">input</code></td><td>オブジェクト</td><td>引数名と値の組</td><td><code>f(**b.input)</code></td></tr>
+</tbody>
+</table>
+</div>
+<div class="note"><p><strong>Python との対応。</strong>JSON の <code>{ }</code> は Python の <code>dict</code>、<code>[ ]</code> は <code>list</code>。SDK が自動で変換してくれるので、手で直す必要はない。</p></div>
+
+<!-- 03 -->
+<h2 id="s3"><span class="n">03</span>HTTP の基本<span class="need must">必須</span></h2>
+<p>API を呼ぶとは、<strong>リクエストを送ってレスポンスを受け取る</strong>こと。1往復で完結し、サーバーは次の呼び出しまで何も覚えていない。</p>
+<h3>ステータスコード</h3>
+<div class="tbl">
+<table>
+<thead><tr><th>コード</th><th>意味</th><th>この API での例</th><th>コードの扱い</th></tr></thead>
+<tbody>
+<tr><td><strong>200</strong></td><td>成功</td><td>応答が返ってきた（<code class="a">stop_reason</code> 入り）</td><td>戻り値を見て分岐</td></tr>
+<tr><td><strong>400</strong></td><td>こちらの送り方が悪い</td><td>履歴が長すぎる、引数の型が違う</td><td rowspan="4">例外として飛んでくる<br>（<code>try / except</code>）</td></tr>
+<tr><td><strong>401</strong></td><td>認証エラー</td><td>API キーが違う・未設定</td></tr>
+<tr><td><strong>429</strong></td><td>制限に達した</td><td>レート制限・残高不足</td></tr>
+<tr><td><strong>500 系</strong></td><td>サーバー側の問題</td><td>一時的な障害</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note warn"><p><strong>ここが混ざりやすい。</strong><code class="a">stop_reason</code> は「<strong>応答が返ってきたとき</strong>に、なぜ生成が止まったか」。応答そのものが作れなかった場合（400 など）は、<code class="a">stop_reason</code> ではなく<strong>エラー</strong>になる。<br>
+出力が上限で切れた → <code class="a">stop_reason: "max_tokens"</code>（200・正常レスポンス）／ 入力が長すぎた → <strong>400 エラー</strong>。</p></div>
+
+<!-- 04 -->
+<h2 id="s4"><span class="n">04</span>Python で使う分だけ<span class="need must">必須</span></h2>
+<div class="two">
+  <div class="box"><h3>dict（辞書）… 名前で引く</h3>
+<pre><code>out = {<span class="m">"verified"</span>: True, <span class="m">"customer_id"</span>: <span class="v">"C-2044"</span>}
+out[<span class="m">"customer_id"</span>]        <span class="c"># 無いとエラー</span>
+out.get(<span class="m">"verified"</span>)        <span class="c"># 無ければ None</span></code></pre></div>
+  <div class="box"><h3>list（配列）… 順に回す</h3>
+<pre><code>results = []
+<b>for</b> b <b>in</b> res.content:
+    results.append(...)</code></pre></div>
+  <div class="box"><h3>** で辞書を引数に展開</h3>
+<pre><code>b.input = {<span class="m">"email"</span>: <span class="v">"a@b.com"</span>}
+f(**b.input)        <span class="c"># f(email="a@b.com") と同じ</span></code></pre>
+  <p style="font-size:13.5px;margin:6px 0 0">Claude が返した引数を、そのまま関数に渡す仕掛け。<code>input_schema</code> の引数名と関数の引数名を揃える理由。</p></div>
+  <div class="box"><h3>辞書で関数を引く</h3>
+<pre><code>IMPL = {<span class="m">"get_customer"</span>: get_customer, …}
+IMPL[b.name](**b.input)</code></pre>
+  <p style="font-size:13.5px;margin:6px 0 0">Python では関数も値。名前（文字列）から関数を取り出せる。</p></div>
+  <div class="box"><h3>try / except … 例外を受け止める</h3>
+<pre><code><b>try</b>:
+    res = client.messages.create(...)
+<b>except</b> anthropic.BadRequestError:
+    ...   <span class="c"># 400 のとき</span></code></pre></div>
+  <div class="box"><h3>JSON 文字列との変換</h3>
+<pre><code>json.dumps(out, ensure_ascii=<b>False</b>)   <span class="c"># dict → 文字列</span>
+json.loads(s)                           <span class="c"># 文字列 → dict</span></code></pre>
+  <p style="font-size:13.5px;margin:6px 0 0"><code class="a">tool_result</code> の <code class="a">content</code> は文字列なので、dict は変換して入れる。</p></div>
+</div>
+
+<!-- 05 -->
+<h2 id="s5"><span class="n">05</span>ステートレス<span class="need must">必須</span></h2>
+<p><strong>API は前回のやりとりを覚えていない。</strong>だから毎回、最初からの履歴を全部送り直す。エージェントの挙動の多くがここから来る。</p>
+<figure>
+<div class="scroll">
+<svg class="diagram" viewBox="0 0 900 220" role="img" aria-label="周回ごとに messages が伸びていく図">
+  <text x="10" y="20" class="t-lab" fill="var(--muted)">送る messages（毎回すべて）</text>
+  <g>
+    <rect x="10" y="36" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <text x="85" y="56" text-anchor="middle" class="t-mono" fill="var(--fg)">1周目：1件</text>
+    <rect x="10" y="88" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <rect x="164" y="88" width="150" height="30" rx="6" fill="var(--theirs-bg)" stroke="var(--theirs)"/>
+    <rect x="318" y="88" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <text x="85" y="108" text-anchor="middle" class="t-mono" fill="var(--fg)">user 依頼</text>
+    <text x="239" y="108" text-anchor="middle" class="t-mono" fill="var(--fg)">assistant tool_use</text>
+    <text x="393" y="108" text-anchor="middle" class="t-mono" fill="var(--fg)">user tool_result</text>
+    <text x="480" y="108" class="t-mono" fill="var(--muted)">← 2周目：3件</text>
+    <rect x="10" y="140" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <rect x="164" y="140" width="150" height="30" rx="6" fill="var(--theirs-bg)" stroke="var(--theirs)"/>
+    <rect x="318" y="140" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <rect x="472" y="140" width="150" height="30" rx="6" fill="var(--theirs-bg)" stroke="var(--theirs)"/>
+    <rect x="626" y="140" width="150" height="30" rx="6" fill="var(--mine-bg)" stroke="var(--mine)"/>
+    <text x="85" y="160" text-anchor="middle" class="t-mono" fill="var(--fg)">user 依頼</text>
+    <text x="239" y="160" text-anchor="middle" class="t-mono" fill="var(--fg)">assistant</text>
+    <text x="393" y="160" text-anchor="middle" class="t-mono" fill="var(--fg)">user 結果</text>
+    <text x="547" y="160" text-anchor="middle" class="t-mono" fill="var(--fg)">assistant</text>
+    <text x="701" y="160" text-anchor="middle" class="t-mono" fill="var(--fg)">user 結果</text>
+    <text x="788" y="160" class="t-mono" fill="var(--muted)">← 3周目：5件</text>
+  </g>
+  <text x="10" y="200" class="t-mono" fill="var(--warn)">入力トークンが毎周増える → コストが増え、いずれコンテキスト上限に当たる</text>
+</svg>
+</div>
+<figcaption>青緑が自分の発言・ツール結果、オレンジが Claude の応答。毎周これを丸ごと送り直している。</figcaption>
+</figure>
+<div class="note api"><p><strong>ここから派生する論点。</strong>プロンプトキャッシュ（同じ前置きを再利用して安くする）、コンテキスト編集（古い結果を消す）、圧縮（要約する）。いずれも「毎回全部送る」という性質への対処。</p></div>
+
+<!-- 06 -->
+<h2 id="s6"><span class="n">06</span>JSON Schema<span class="need plus">加点</span></h2>
+<p>ツールの引数の形を書くための記法。<strong>覚えるのは4語だけ</strong>で足りる。</p>
+<pre><code><span class="a">"input_schema"</span>: {
+  <span class="a">"type"</span>: <span class="a">"object"</span>,                          <span class="c"># 引数はいつもオブジェクト</span>
+  <span class="a">"properties"</span>: {                             <span class="c"># 引数の一覧</span>
+    <span class="m">"order_id"</span>: {<span class="a">"type"</span>: <span class="a">"string"</span>, <span class="a">"description"</span>: <span class="m">"注文番号"</span>},
+    <span class="m">"reason"</span>:   {<span class="a">"type"</span>: <span class="a">"string"</span>, <span class="a">"enum"</span>: [<span class="m">"返品"</span>, <span class="m">"不良"</span>]}   <span class="c"># 選択肢を固定</span>
+  },
+  <span class="a">"required"</span>: [<span class="m">"order_id"</span>]                   <span class="c"># 必須の引数</span>
+}</code></pre>
+<div class="tbl">
+<table>
+<thead><tr><th>語</th><th>意味</th><th>効き目</th></tr></thead>
+<tbody>
+<tr><td><code class="a">type</code></td><td>値の種類（<code>string</code> / <code>integer</code> / <code>boolean</code> / <code>object</code> / <code>array</code>）</td><td>型違いを防ぐ</td></tr>
+<tr><td><code class="a">properties</code></td><td>引数名とその定義</td><td>引数の一覧になる</td></tr>
+<tr><td><code class="a">required</code></td><td>必須の引数</td><td>省略を防ぐ</td></tr>
+<tr><td><code class="a">enum</code></td><td>取りうる値を列挙</td><td><strong>選択肢を狭めて事故を減らす</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="note"><p><strong>試験での効き方。</strong>「余計な引数を消す」「<code class="a">enum</code> で候補を絞る」は、プロンプトより確実な対策として選択肢に出る。構造で選べなくするのが強い、という発想。</p></div>
+
+<!-- 07 -->
+<h2 id="s7"><span class="n">07</span>トークンと上限<span class="need plus">加点</span></h2>
+<p>トークンは文章を区切った単位（日本語ならおおよそ1〜2文字で1トークン）。課金も上限もこの単位。</p>
+<div class="tbl">
+<table>
+<thead><tr><th>用語</th><th>何の上限か</th><th>超えると</th></tr></thead>
+<tbody>
+<tr><td><code class="a">max_tokens</code></td><td><strong>出力</strong>の上限（自分で指定）</td><td><code class="a">stop_reason: "max_tokens"</code>（正常レスポンス）</td></tr>
+<tr><td>コンテキストウィンドウ</td><td><strong>入力＋出力</strong>の上限（モデルごとに固定）</td><td><strong>400 エラー</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p><code class="a">usage</code> で実際の消費が見える。<code class="a">input_tokens</code>（送った分）/ <code class="a">output_tokens</code>（返ってきた分）/ <code class="a">cache_read_input_tokens</code>（キャッシュから読めた分）。</p>
+
+<!-- 08 -->
+<h2 id="s8"><span class="n">08</span>SDK とは<span class="need plus">加点</span></h2>
+<p>API を言語から呼びやすくしたライブラリ。<strong>中身の API は同じもの</strong>で、SDK は包み紙にすぎない。</p>
+<figure>
+<div class="scroll">
+<svg class="diagram" viewBox="0 0 900 150" role="img" aria-label="自分のコード、SDK、HTTP、APIの階層図">
+  <rect x="14" y="40" width="180" height="56" rx="8" fill="var(--mine-bg)" stroke="var(--mine)" stroke-width="1.5"/>
+  <text x="104" y="63" text-anchor="middle" class="t-lab" fill="var(--fg)">自分のコード</text>
+  <text x="104" y="82" text-anchor="middle" class="t-mono" fill="var(--muted)">agent.py</text>
+  <rect x="234" y="40" width="200" height="56" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+  <text x="334" y="63" text-anchor="middle" class="t-lab" fill="var(--fg)">SDK（ライブラリ）</text>
+  <text x="334" y="82" text-anchor="middle" class="t-mono" fill="var(--muted)">import anthropic</text>
+  <rect x="474" y="40" width="180" height="56" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+  <text x="564" y="63" text-anchor="middle" class="t-lab" fill="var(--fg)">HTTP 通信</text>
+  <text x="564" y="82" text-anchor="middle" class="t-mono" fill="var(--muted)">POST /v1/messages</text>
+  <rect x="694" y="40" width="190" height="56" rx="8" fill="var(--theirs-bg)" stroke="var(--theirs)" stroke-width="1.5"/>
+  <text x="789" y="63" text-anchor="middle" class="t-lab" fill="var(--fg)">Anthropic の API</text>
+  <text x="789" y="82" text-anchor="middle" class="t-mono" fill="var(--muted)">Claude</text>
+  <text x="214" y="72" text-anchor="middle" fill="var(--muted)">→</text>
+  <text x="454" y="72" text-anchor="middle" fill="var(--muted)">→</text>
+  <text x="674" y="72" text-anchor="middle" fill="var(--muted)">→</text>
+  <text x="14" y="126" class="t-mono" fill="var(--muted)">SDK の仕事：JSON への変換 ／ 認証ヘッダの付与 ／ 再試行 ／ HTTP エラーを Python の例外に変換 ／ 型の用意</text>
+</svg>
+</div>
+<figcaption>SDK を使わず <code>curl</code> で直接叩いても同じことができる。フィールド名（<code class="a">stop_reason</code> など）は SDK ではなく API の仕様なので、言語が変わっても同じ。</figcaption>
+</figure>
+
+<!-- 09 -->
+<h2 id="s9"><span class="n">09</span>覚えておくと読める用語<span class="need plus">加点</span></h2>
+<div class="tbl">
+<table>
+<thead><tr><th>用語</th><th>意味</th><th>この文脈での例</th></tr></thead>
+<tbody>
+<tr><td><strong>enum（列挙）</strong></td><td>取りうる値が決まっているもの</td><td><code class="a">stop_reason</code> は6値の enum</td></tr>
+<tr><td><strong>スキーマ</strong></td><td>データの形の定義</td><td><code class="a">input_schema</code>、DB のテーブル定義</td></tr>
+<tr><td><strong>ペイロード</strong></td><td>実際に送る中身のデータ</td><td>リクエストの JSON 本体</td></tr>
+<tr><td><strong>副作用</strong></td><td>外の世界を変えてしまう処理</td><td>返金、削除、メール送信</td></tr>
+<tr><td><strong>冪等（べきとう）</strong></td><td>何度実行しても結果が同じ</td><td>検索は冪等、返金は<strong>非冪等</strong></td></tr>
+<tr><td><strong>決定論的</strong></td><td>必ず同じ結果になる</td><td>コードによる条件チェック</td></tr>
+<tr><td><strong>確率的</strong></td><td>結果がばらつく</td><td>プロンプトでの指示、Few-shot</td></tr>
+<tr><td><strong>境界</strong></td><td>責任や所有の切れ目</td><td>API の境界、プロセスの境界</td></tr>
+<tr><td><strong>ステートレス / ステートフル</strong></td><td>状態を持たない / 持つ</td><td>Messages API は前者</td></tr>
+<tr><td><strong>エスカレーション</strong></td><td>人間に引き継ぐこと</td><td><code class="m">escalate_to_human</code></td></tr>
+</tbody>
+</table>
+</div>
+<div class="note warn"><p><strong>副作用と冪等性がなぜ効くか。</strong>検索は間違えてもやり直せるが、返金は取り返せない。<strong>非冪等で副作用のある処理ほど、確率的な仕組みに任せてはいけない</strong>ので、コードで止める（選択肢 A）という結論になる。</p></div>
+
+<footer>
+対応する実装: <code>labs/scenario1-no-mcp/</code>（<code>agent.py</code> = ループ、<code>tools.py</code> = ツール定義、<code>infra/db.py</code> = 自社DB、<code>replay/</code> = 記録と再生）。
+関連: <a href="05_domain1-terms.html">05 ドメイン1 用語リファレンス</a> / <a href="04_trace-replay.html">04 やりとり再生</a> / <a href="03_scenario1-code-map.html">03 コード地図</a>
+</footer>
+</div>

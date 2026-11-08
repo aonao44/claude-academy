@@ -1,0 +1,220 @@
+<title>MCP はこう走る</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6;
+  --theirs:#b8560a; --theirs-bg:#fdf0e2;
+  --mcp:#5b4bb3; --mcp-bg:#efecfb;
+  --ext:#2e7d32; --ext-bg:#e8f5e9;
+  --code-bg:#f4f1ec; --warn:#b3261e; --warn-bg:#fbe9e7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+    --mcp:#b2a6f5; --mcp-bg:#272140; --ext:#81c784; --ext-bg:#12331a;
+    --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --theirs:#f0a35c; --theirs-bg:#3a2712;
+  --mcp:#b2a6f5; --mcp-bg:#272140; --ext:#81c784; --ext-bg:#12331a;
+  --code-bg:#23222a; --warn:#ff8a80; --warn-bg:#3a1a18;
+}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.75}
+.wrap{max-width:960px;margin:0 auto;padding-inline:18px;padding-block:28px 60px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--mine);font-weight:700;margin:0 0 4px}
+h1{font-size:clamp(20px,3.4vw,27px);margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:40px 0 6px;padding-top:14px;border-top:1px solid var(--line);text-wrap:balance}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+p,li{font-size:14.5px}
+code{background:var(--code-bg);padding:.08em .36em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.fig{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:12px;margin-top:12px;overflow-x:auto}
+.fig svg{display:block;width:100%;height:auto}
+.fig.wide svg{min-width:760px}
+.fig.mid svg{min-width:640px}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+svg .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:600}
+.tbl{overflow-x:auto}
+.note{border-left:4px solid var(--mine);background:var(--mine-bg);padding:9px 13px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+.note.key{border-color:var(--mcp);background:var(--mcp-bg)}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">MCP ・ Gmail を例に</p>
+  <h1>MCP はこう走る</h1>
+  <p class="lede">「未読の請求メールを要約して」と頼んでから答えが返るまでに、どのプログラムがどこで動き、何がどの順番で流れるか。サーバーやメールの中身は説明用の例です。</p>
+</header>
+
+<h2><span class="n">1</span>一番大事なこと：会話は2本ある</h2>
+<p>Claude と MCP サーバーは、<b>直接つながっていません</b>。真ん中のクライアントが、性質の違う2本の会話を同時に受け持ち、間で中継しています。</p>
+
+<div class="fig mid" role="img" aria-label="Claude とクライアントの間の会話（Messages API）と、クライアントと MCP サーバーの間の会話（MCP）の2本があり、クライアントが中継している図">
+<svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/>
+    </marker>
+  </defs>
+  <rect x="10" y="60" width="180" height="120" rx="12" style="fill:var(--theirs-bg);stroke:var(--theirs);stroke-width:2"/>
+  <text x="100" y="98" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--fg)">Claude</text>
+  <text x="100" y="124" text-anchor="middle" font-size="12" style="fill:var(--muted)">Anthropic のサーバー</text>
+  <text x="100" y="146" text-anchor="middle" font-size="12" style="fill:var(--muted)">考えて依頼を書くだけ</text>
+
+  <rect x="350" y="40" width="200" height="160" rx="12" style="fill:var(--mine-bg);stroke:var(--mine);stroke-width:2"/>
+  <text x="450" y="78" text-anchor="middle" font-size="17" font-weight="700" style="fill:var(--fg)">クライアント</text>
+  <text x="450" y="104" text-anchor="middle" font-size="12" style="fill:var(--muted)">Claude Code／claude.ai／</text>
+  <text x="450" y="122" text-anchor="middle" font-size="12" style="fill:var(--muted)">自作のプログラム</text>
+  <text x="450" y="152" text-anchor="middle" font-size="12.5" font-weight="700" style="fill:var(--mine)">中継役・実際に呼ぶ係</text>
+  <text x="450" y="174" text-anchor="middle" font-size="11.5" style="fill:var(--muted)">実行前にここで止められる</text>
+
+  <rect x="710" y="60" width="180" height="120" rx="12" style="fill:var(--mcp-bg);stroke:var(--mcp);stroke-width:2"/>
+  <text x="800" y="98" text-anchor="middle" font-size="16" font-weight="700" style="fill:var(--fg)">MCP サーバー</text>
+  <text x="800" y="124" text-anchor="middle" font-size="12" style="fill:var(--muted)">Gmail 用のつなぎ役</text>
+  <text x="800" y="146" text-anchor="middle" font-size="12" style="fill:var(--muted)">Gmail の鍵を持っている</text>
+
+  <line x1="196" y1="105" x2="344" y2="105" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#a)"/>
+  <line x1="344" y1="140" x2="196" y2="140" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#a)"/>
+  <text x="270" y="30" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--theirs)">会話①　Messages API</text>
+  <text x="270" y="96" text-anchor="middle" font-size="11" style="fill:var(--muted)">tools・messages</text>
+  <text x="270" y="162" text-anchor="middle" font-size="11" style="fill:var(--muted)">tool_use</text>
+
+  <line x1="556" y1="105" x2="704" y2="105" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#a)"/>
+  <line x1="704" y1="140" x2="556" y2="140" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#a)"/>
+  <text x="630" y="30" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--mcp)">会話②　MCP</text>
+  <text x="630" y="96" text-anchor="middle" font-size="11" style="fill:var(--muted)">tools/call</text>
+  <text x="630" y="162" text-anchor="middle" font-size="11" style="fill:var(--muted)">結果</text>
+
+  <text x="450" y="236" text-anchor="middle" font-size="12.5" style="fill:var(--muted)">Claude は MCP サーバーの存在を知らない。MCP サーバーも Claude の存在を知らない。</text>
+</svg>
+</div>
+
+<div class="note key"><b>MCP（規格）が決めているのは会話②の話し方だけ</b>です。会話①は、これまで練習用コード <code>labs/scenario1-no-mcp/agent.py</code> で見てきた Messages API（system・tools・messages を送り、tool_use が返る）そのものです。</div>
+
+<h2><span class="n">2</span>最初から最後までの流れ</h2>
+<p>縦に時間が流れます。オレンジの線が会話①、紫の線が会話②、緑の線は MCP サーバーと Gmail の間（MCP とは関係のない、Google の API）です。</p>
+
+<div class="fig wide" role="img" aria-label="起動時の準備から、ユーザーの依頼、tool_use、tools/call、Gmail API、結果の返却、最終回答までの時系列図">
+<svg viewBox="0 0 960 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" style="fill:var(--muted)"/>
+    </marker>
+  </defs>
+  <!-- lane heads -->
+  <rect x="20" y="10" width="160" height="40" rx="8" style="fill:var(--code-bg);stroke:var(--line)"/>
+  <text x="100" y="35" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--fg)">あなた</text>
+  <rect x="250" y="10" width="160" height="40" rx="8" style="fill:var(--theirs-bg);stroke:var(--theirs)"/>
+  <text x="330" y="35" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--fg)">Claude</text>
+  <rect x="480" y="10" width="160" height="40" rx="8" style="fill:var(--mine-bg);stroke:var(--mine)"/>
+  <text x="560" y="35" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--fg)">クライアント</text>
+  <rect x="710" y="10" width="110" height="40" rx="8" style="fill:var(--mcp-bg);stroke:var(--mcp)"/>
+  <text x="765" y="35" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--fg)">MCP サーバー</text>
+  <rect x="850" y="10" width="90" height="40" rx="8" style="fill:var(--ext-bg);stroke:var(--ext)"/>
+  <text x="895" y="35" text-anchor="middle" font-size="13" font-weight="700" style="fill:var(--fg)">Gmail</text>
+  <!-- lifelines -->
+  <line x1="100" y1="50" x2="100" y2="850" style="stroke:var(--line);stroke-dasharray:4 4"/>
+  <line x1="330" y1="50" x2="330" y2="850" style="stroke:var(--line);stroke-dasharray:4 4"/>
+  <line x1="560" y1="50" x2="560" y2="850" style="stroke:var(--line);stroke-dasharray:4 4"/>
+  <line x1="765" y1="50" x2="765" y2="850" style="stroke:var(--line);stroke-dasharray:4 4"/>
+  <line x1="895" y1="50" x2="895" y2="850" style="stroke:var(--line);stroke-dasharray:4 4"/>
+
+  <!-- phase: startup -->
+  <rect x="10" y="66" width="940" height="22" rx="4" style="fill:var(--code-bg)"/>
+  <text x="20" y="82" font-size="12" font-weight="700" style="fill:var(--muted)">準備（起動したとき、まだ何も頼んでいない）</text>
+
+  <line x1="560" y1="112" x2="761" y2="112" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#b)"/>
+  <text x="572" y="106" font-size="11.5" style="fill:var(--fg)">① 接続して「何ができる？」</text>
+  <text x="572" y="126" font-size="10.5" class="mono" style="fill:var(--mcp)">initialize → tools/list</text>
+
+  <line x1="765" y1="152" x2="564" y2="152" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#b)"/>
+  <text x="580" y="146" font-size="11.5" style="fill:var(--fg)">② ツールの一覧（名前・説明・引数）</text>
+  <text x="580" y="166" font-size="10.5" class="mono" style="fill:var(--mcp)">search_threads, get_thread, send_message …</text>
+
+  <!-- phase: request -->
+  <rect x="10" y="188" width="940" height="22" rx="4" style="fill:var(--code-bg)"/>
+  <text x="20" y="204" font-size="12" font-weight="700" style="fill:var(--muted)">依頼</text>
+
+  <line x1="100" y1="236" x2="556" y2="236" style="stroke:var(--muted);stroke-width:2" marker-end="url(#b)"/>
+  <text x="112" y="230" font-size="11.5" style="fill:var(--fg)">③「未読の請求メールを要約して」</text>
+
+  <line x1="560" y1="278" x2="334" y2="278" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#b)"/>
+  <text x="348" y="272" font-size="11.5" style="fill:var(--fg)">④ 依頼＋②の一覧を tools に入れて送る</text>
+  <text x="348" y="292" font-size="10.5" class="mono" style="fill:var(--theirs)">messages.create(tools=[…], messages=[…])</text>
+
+  <!-- phase: tool -->
+  <rect x="10" y="312" width="940" height="22" rx="4" style="fill:var(--code-bg)"/>
+  <text x="20" y="328" font-size="12" font-weight="700" style="fill:var(--muted)">ツールの往復（何回か繰り返す）</text>
+
+  <line x1="330" y1="362" x2="556" y2="362" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#b)"/>
+  <text x="342" y="356" font-size="11.5" style="fill:var(--fg)">⑤ 依頼の箱を返す</text>
+  <text x="342" y="378" font-size="10.5" class="mono" style="fill:var(--theirs)">tool_use: search_threads</text>
+  <text x="342" y="393" font-size="10.5" class="mono" style="fill:var(--theirs)">{query:"is:unread 請求"}</text>
+
+  <rect x="500" y="404" width="120" height="30" rx="6" style="fill:var(--warn-bg);stroke:var(--warn)"/>
+  <text x="560" y="424" text-anchor="middle" font-size="11" style="fill:var(--warn)">⑥ 実行してよいか確認</text>
+
+  <line x1="560" y1="462" x2="761" y2="462" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#b)"/>
+  <text x="572" y="456" font-size="11.5" style="fill:var(--fg)">⑦ 実際に呼ぶ</text>
+  <text x="572" y="476" font-size="10.5" class="mono" style="fill:var(--mcp)">tools/call search_threads</text>
+
+  <line x1="765" y1="506" x2="891" y2="506" style="stroke:var(--ext);stroke-width:2" marker-end="url(#b)"/>
+  <text x="772" y="500" font-size="11" style="fill:var(--fg)">⑧ Gmail API</text>
+  <line x1="895" y1="536" x2="769" y2="536" style="stroke:var(--ext);stroke-width:2" marker-end="url(#b)"/>
+  <text x="776" y="556" font-size="11" style="fill:var(--fg)">メール3件</text>
+
+  <line x1="765" y1="586" x2="564" y2="586" style="stroke:var(--mcp);stroke-width:2" marker-end="url(#b)"/>
+  <text x="580" y="580" font-size="11.5" style="fill:var(--fg)">⑨ 結果を返す</text>
+
+  <line x1="560" y1="630" x2="334" y2="630" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#b)"/>
+  <text x="348" y="624" font-size="11.5" style="fill:var(--fg)">⑩ tool_result にして履歴に足し、送り直す</text>
+  <text x="348" y="644" font-size="10.5" class="mono" style="fill:var(--theirs)">messages=[…, tool_use, tool_result]</text>
+
+  <text x="342" y="682" font-size="11.5" style="fill:var(--muted)">（中身を読むため get_thread でも同じ⑤〜⑩を繰り返す）</text>
+
+  <!-- phase: answer -->
+  <rect x="10" y="702" width="940" height="22" rx="4" style="fill:var(--code-bg)"/>
+  <text x="20" y="718" font-size="12" font-weight="700" style="fill:var(--muted)">回答</text>
+
+  <line x1="330" y1="754" x2="556" y2="754" style="stroke:var(--theirs);stroke-width:2" marker-end="url(#b)"/>
+  <text x="342" y="748" font-size="11.5" style="fill:var(--fg)">⑪ 要約の文章（end_turn）</text>
+
+  <line x1="560" y1="800" x2="104" y2="800" style="stroke:var(--muted);stroke-width:2" marker-end="url(#b)"/>
+  <text x="116" y="794" font-size="11.5" style="fill:var(--fg)">⑫ 画面に表示</text>
+</svg>
+</div>
+
+<div class="tbl"><table>
+  <tr><th>番号</th><th>何が起きているか</th><th>どの会話か</th></tr>
+  <tr><td>①②</td><td>クライアントが起動すると、つないである MCP サーバーに「何ができる？」と聞き、ツールの一覧を受け取っておく。まだ Claude は関わっていない</td><td>会話②（MCP）</td></tr>
+  <tr><td>③④</td><td>あなたの依頼が来たら、クライアントは②で受け取った一覧を <code>tools</code> に詰めて Claude に送る。Claude から見れば、練習用コードの tools.py で自分で書いたツールと区別がつかない</td><td>会話①</td></tr>
+  <tr><td>⑤</td><td>Claude は tool_use（依頼の箱）を返すだけ。Gmail には触れない</td><td>会話①</td></tr>
+  <tr><td>⑥</td><td>クライアントが「実行してよいか」を判断する場所。送信のような危険な操作はここで止めたり、人間に確認したりできる</td><td>―</td></tr>
+  <tr><td>⑦〜⑨</td><td>クライアントが MCP の決まった形で呼び出し、サーバーが Gmail API で検索して結果を返す</td><td>会話②＋Google の API</td></tr>
+  <tr><td>⑩</td><td>結果を tool_result の箱にして messages に足し、Claude に送り直す（原則④：渡さないと Claude は知らない）</td><td>会話①</td></tr>
+  <tr><td>⑪⑫</td><td>tool_use が来なくなったら（end_turn）、最終回答を表示して終わり</td><td>会話①</td></tr>
+</table></div>
+
+<h2><span class="n">3</span>クライアントと MCP サーバーはどこで動くか</h2>
+<p>構図はいつも同じで、<b>どのプログラムがクライアント役をするか</b>と、<b>サーバーがどこにあるか</b>だけが変わります。</p>
+<div class="tbl"><table>
+  <tr><th>使っているもの</th><th>クライアント役</th><th>MCP サーバーの置き場の例</th></tr>
+  <tr><td>Claude アプリ（claude.ai・スマホ）</td><td>claude.ai のサービス（Anthropic 側）</td><td>インターネット上（コネクタ）</td></tr>
+  <tr><td>Claude Code</td><td>あなたのパソコンで動く Claude Code</td><td>インターネット上、またはパソコン上で一緒に起動するプログラム</td></tr>
+  <tr><td>自作のエージェント（Agent SDK）</td><td>あなたのプログラム（SDK が中継を受け持つ）</td><td>どちらも可</td></tr>
+</table></div>
+
+<h2><span class="n">4</span>練習用コードとの関係</h2>
+<p><code>labs/scenario1-no-mcp/</code> では、ツールの中身（<code>tools.py</code>）を自分のプログラムの中に直接書いていました。つまり、会話②がなく、⑦〜⑨の代わりに自分の関数を直接呼んでいます。MCP にすると、その関数が別のプログラム（MCP サーバー）に引っ越し、間を MCP の決まった話し方でつなぐことになります。Claude 側（会話①）は何も変わりません。</p>
+</div>

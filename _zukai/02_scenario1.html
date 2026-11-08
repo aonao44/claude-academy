@@ -1,0 +1,280 @@
+<meta charset="utf-8">
+<title>シナリオ1の解剖</title>
+<style>
+:root{
+  --bg:#fbfaf8; --fg:#1d1c1a; --muted:#5f5b55; --line:#ddd8d0; --card:#fff;
+  --mine:#0e7c86; --mine-bg:#e8f5f6; --mine-bg2:#f4fbfb;
+  --theirs:#c2620f; --theirs-bg:#fdf0e2; --theirs-bg2:#fef8f1;
+  --code-bg:#f2efe9;
+}
+:root:not([data-theme="light"]){ }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+    --mine:#5fd3dd; --mine-bg:#10333a; --mine-bg2:#0c262b;
+    --theirs:#f0a35c; --theirs-bg:#3a2712; --theirs-bg2:#2b1d0e;
+    --code-bg:#26242d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16151a; --fg:#eceaf0; --muted:#a49fae; --line:#35323d; --card:#1f1e25;
+  --mine:#5fd3dd; --mine-bg:#10333a; --mine-bg2:#0c262b;
+  --theirs:#f0a35c; --theirs-bg:#3a2712; --theirs-bg2:#2b1d0e;
+  --code-bg:#26242d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:none;padding-block:24px;padding-inline:10px}
+header{border-bottom:2px solid var(--line);padding-bottom:14px;margin-bottom:26px}
+h1{font-size:clamp(20px,3.4vw,28px);margin:0 0 6px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0;font-size:14px}
+h2{font-size:clamp(17px,2.4vw,21px);margin:44px 0 6px;padding-top:14px;border-top:1px solid var(--line)}
+h2 .n{color:var(--mine);font-variant-numeric:tabular-nums;margin-right:.5em}
+.claim{margin:0 0 14px;font-size:14px;color:var(--muted)}
+p,li{font-size:15px;max-width:66ch}
+figure{margin:0 0 8px;padding:10px 8px;background:var(--card);
+  border:1px solid var(--line);border-radius:10px}
+svg.diagram{display:block;width:100%;height:auto}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:8px;padding:0 4px;max-width:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--muted);margin:10px 0 0;padding:0 4px}
+.legend b{font-weight:600}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+code{background:var(--code-bg);padding:.12em .4em;border-radius:4px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:8px;overflow-x:auto;
+  font-size:12.5px;line-height:1.6;max-width:none}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--mine-bg);font-weight:600}
+.ico{width:18px;height:18px;vertical-align:-4px;margin-right:5px}
+.tbl-scroll{overflow-x:auto}
+footer{margin-top:52px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--muted)}
+footer li{font-size:12.5px}
+.on-dark{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .on-light{display:none}
+  :root:not([data-theme="light"]) .on-dark{display:inline}
+}
+:root[data-theme="dark"] .on-light{display:none}
+:root[data-theme="dark"] .on-dark{display:inline}
+/* SVG 内テキスト */
+.t-lane{font-size:14px;font-weight:700;letter-spacing:.02em}
+.t-title{font-size:14.5px;font-weight:650}
+.t-sub{font-size:11.5px}
+.t-arrow{font-size:11.5px;font-weight:600}
+.t-note{font-size:12px}
+.t-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+</style>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+<image id="ic-loop-l" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19Tb3VyY2UtQ29kZV80OF9MaWdodDwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19Tb3VyY2UtQ29kZV80OCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTI1LjA1MTgsMTkuNjg0IEwyNi45NDc4LDIwLjMxNyBMMjIuOTQ3OCwzMi4zMTcgTDIxLjA1MTgsMzEuNjg0IEwyNS4wNTE4LDE5LjY4NCBaIE0zNC42MjQ4LDI1LjIyIEMzNC44NjI4LDI1LjQwOSAzNC45OTk4LDI1LjY5NyAzNC45OTk4LDI2IEMzNC45OTk4LDI2LjMwNCAzNC44NjI4LDI2LjU5MiAzNC42MjQ4LDI2Ljc4MSBMMjkuNjI0OCwzMC43ODEgTDI4LjM3NDgsMjkuMjIgTDMyLjM5OTgsMjYgTDI4LjM3NDgsMjIuNzgxIEwyOS42MjQ4LDIxLjIyIEwzNC42MjQ4LDI1LjIyIFogTTE5LjYyNDgsMjIuNzgxIEwxNS42MDA4LDI2IEwxOS42MjQ4LDI5LjIyIEwxOC4zNzQ4LDMwLjc4MSBMMTMuMzc0OCwyNi43ODEgQzEzLjEzNzgsMjYuNTkyIDEyLjk5OTgsMjYuMzA0IDEyLjk5OTgsMjYgQzEyLjk5OTgsMjUuNjk3IDEzLjEzNzgsMjUuNDA5IDEzLjM3NDgsMjUuMjIgTDE4LjM3NDgsMjEuMjIgTDE5LjYyNDgsMjIuNzgxIFogTTkuOTk5OCw0NCBMMTAuMDA2OCw0IEwyNy45OTk4LDQgTDI3Ljk5OTgsMTMgQzI3Ljk5OTgsMTMuNTUyIDI4LjQ0NzgsMTQgMjguOTk5OCwxNCBMMzcuOTk5OCwxNCBMMzcuOTk5OCw0NCBMOS45OTk4LDQ0IFogTTI5Ljk5OTgsNS40MTQgTDM2LjU4NTgsMTIgTDI5Ljk5OTgsMTIgTDI5Ljk5OTgsNS40MTQgWiBNMzkuNzA2OCwxMi4yOTMgTDI5LjcwNjgsMi4yOTMgQzI5LjUxOTgsMi4xMDUgMjkuMjY1OCwyIDI4Ljk5OTgsMiBMOS45OTk4LDIgQzguODIyOCwyIDcuOTk5OCwyLjgyMiA3Ljk5OTgsNCBMNy45OTk4LDQ0IEM3Ljk5OTgsNDUuMTQgOC44NTk4LDQ2IDkuOTk5OCw0NiBMMzcuOTk5OCw0NiBDMzkuMTQwOCw0NiAzOS45OTk4LDQ1LjE0IDM5Ljk5OTgsNDQgTDM5Ljk5OTgsMTMgQzM5Ljk5OTgsMTIuNzM0IDM5Ljg5NDgsMTIuNDggMzkuNzA2OCwxMi4yOTMgTDM5LjcwNjgsMTIuMjkzIFoiIGlkPSJGaWxsLTEiIGZpbGw9IiMyMzJGM0QiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+"></image>
+<image id="ic-loop-d" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19Tb3VyY2UtQ29kZV80OF9EYXJrPC90aXRsZT4KICAgIDxnIGlkPSJJY29uLVJlc291cmNlL0dlbmVyYWwtUmVzb3VyY2UvUmVzX1NvdXJjZS1Db2RlXzQ4IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cGF0aCBkPSJNMjUuMDUxOCwxOS42ODQgTDI2Ljk0NzgsMjAuMzE3IEwyMi45NDc4LDMyLjMxNyBMMjEuMDUxOCwzMS42ODQgTDI1LjA1MTgsMTkuNjg0IFogTTM0LjYyNDgsMjUuMjIgQzM0Ljg2MjgsMjUuNDA5IDM0Ljk5OTgsMjUuNjk3IDM0Ljk5OTgsMjYgQzM0Ljk5OTgsMjYuMzA0IDM0Ljg2MjgsMjYuNTkyIDM0LjYyNDgsMjYuNzgxIEwyOS42MjQ4LDMwLjc4MSBMMjguMzc0OCwyOS4yMiBMMzIuMzk5OCwyNiBMMjguMzc0OCwyMi43ODEgTDI5LjYyNDgsMjEuMjIgTDM0LjYyNDgsMjUuMjIgWiBNMTkuNjI0OCwyMi43ODEgTDE1LjYwMDgsMjYgTDE5LjYyNDgsMjkuMjIgTDE4LjM3NDgsMzAuNzgxIEwxMy4zNzQ4LDI2Ljc4MSBDMTMuMTM3OCwyNi41OTIgMTIuOTk5OCwyNi4zMDQgMTIuOTk5OCwyNiBDMTIuOTk5OCwyNS42OTcgMTMuMTM3OCwyNS40MDkgMTMuMzc0OCwyNS4yMiBMMTguMzc0OCwyMS4yMiBMMTkuNjI0OCwyMi43ODEgWiBNOS45OTk4LDQ0IEwxMC4wMDY4LDQgTDI3Ljk5OTgsNCBMMjcuOTk5OCwxMyBDMjcuOTk5OCwxMy41NTIgMjguNDQ3OCwxNCAyOC45OTk4LDE0IEwzNy45OTk4LDE0IEwzNy45OTk4LDQ0IEw5Ljk5OTgsNDQgWiBNMjkuOTk5OCw1LjQxNCBMMzYuNTg1OCwxMiBMMjkuOTk5OCwxMiBMMjkuOTk5OCw1LjQxNCBaIE0zOS43MDY4LDEyLjI5MyBMMjkuNzA2OCwyLjI5MyBDMjkuNTE5OCwyLjEwNSAyOS4yNjU4LDIgMjguOTk5OCwyIEw5Ljk5OTgsMiBDOC44MjI4LDIgNy45OTk4LDIuODIyIDcuOTk5OCw0IEw3Ljk5OTgsNDQgQzcuOTk5OCw0NS4xNCA4Ljg1OTgsNDYgOS45OTk4LDQ2IEwzNy45OTk4LDQ2IEMzOS4xNDA4LDQ2IDM5Ljk5OTgsNDUuMTQgMzkuOTk5OCw0NCBMMzkuOTk5OCwxMyBDMzkuOTk5OCwxMi43MzQgMzkuODk0OCwxMi40OCAzOS43MDY4LDEyLjI5MyBMMzkuNzA2OCwxMi4yOTMgWiIgaWQ9IkZpbGwtMSIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4="></image>
+<image id="ic-tools-l" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19Ub29sa2l0XzQ4X0xpZ2h0PC90aXRsZT4KICAgIDxnIGlkPSJJY29uLVJlc291cmNlL0dlbmVyYWwtUmVzb3VyY2UvUmVzX1Rvb2xraXRfNDgiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxwYXRoIGQ9Ik0zMi40MzgsMzQuMjAzIEwyNS4xMiwyNi44ODQgTDI2Ljk1NywyNS4wNDcgTDM0LjI3NSwzMi4zNjYgTDMyLjQzOCwzNC4yMDMgWiBNMTMuOTIyLDE0LjIwMSBMMTQuMjczLDEzLjg1IEwxNy4xMTcsMTUuOTI0IEwxNS45OTYsMTcuMDQ1IEwxMy45MjIsMTQuMjAxIFogTTI3LjY2NCwyMi45MjYgQzI3LjI4OSwyMi41NTEgMjYuNjI1LDIyLjU1MSAyNi4yNSwyMi45MjYgTDI1LjMzMSwyMy44NDUgTDE4LjY3NywxNy4xOTEgTDE5LjM1NywxNi41MTIgQzE5LjU2NCwxNi4zMDUgMTkuNjY5LDE2LjAxOCAxOS42NDcsMTUuNzI3IEMxOS42MjUsMTUuNDM1IDE5LjQ3NSwxNS4xNjkgMTkuMjM5LDE0Ljk5NyBMMTQuNzU5LDExLjczIEMxNC4zNjIsMTEuNDQxIDEzLjgxMiwxMS40ODMgMTMuNDYzLDExLjgzMSBMMTEuOTAzLDEzLjM5MSBDMTEuNTU0LDEzLjc0IDExLjUxMSwxNC4yOSAxMS44MDIsMTQuNjg3IEwxNS4wNjksMTkuMTY3IEMxNS4yNDEsMTkuNDAzIDE1LjUwNywxOS41NTMgMTUuNzk5LDE5LjU3NSBDMTUuODI1LDE5LjU3NyAxNS44NTEsMTkuNTc4IDE1Ljg3NiwxOS41NzggQzE2LjE0MSwxOS41NzggMTYuMzk1LDE5LjQ3NCAxNi41ODQsMTkuMjg1IEwxNy4yNjMsMTguNjA1IEwyMy45MTcsMjUuMjU5IEwyMi45OTksMjYuMTc3IEMyMi42MDgsMjYuNTY3IDIyLjYwOCwyNy4yIDIyLjk5OSwyNy41OTEgTDMxLjczMSwzNi4zMjQgQzMxLjkxOCwzNi41MTIgMzIuMTcyLDM2LjYxNyAzMi40MzgsMzYuNjE3IEMzMi43MDQsMzYuNjE3IDMyLjk1OCwzNi41MTIgMzMuMTQ1LDM2LjMyNCBMMzYuMzk2LDMzLjA3MyBDMzYuNzg3LDMyLjY4MiAzNi43ODcsMzIuMDUgMzYuMzk2LDMxLjY1OSBMMjcuNjY0LDIyLjkyNiBaIE0yNy4xNzYsMTcuMjcxIEMyNi44NzQsMTUuNzIgMjcuMzU5LDE0LjA3NyAyOC40OTIsMTIuOTQ0IEMyOS45MzksMTEuNDk0IDMyLjE1NCwxMS4xMjUgMzQsMTIuMDIyIEMzNC4yOSwxMi4xNjQgMzQuNDk1LDEyLjQzNyAzNC41NDgsMTIuNzU2IEMzNC42MDIsMTMuMDc1IDM0LjQ5OCwxMy40IDM0LjI2OSwxMy42MjkgTDMyLjc4NiwxNS4xMTIgTDMzLjExNSwxNS40NDIgTDM0LjU5NiwxMy45NjEgQzM0LjgyNSwxMy43MzIgMzUuMTQ5LDEzLjYyOSAzNS40NjcsMTMuNjgyIEMzNS43ODYsMTMuNzM0IDM2LjA1OSwxMy45MzcgMzYuMjAxLDE0LjIyNyBDMzcuMTA1LDE2LjA2OSAzNi43MzgsMTguMjgyIDM1LjI4NiwxOS43MzMgQzM0LjEzMywyMC44ODYgMzIuNTE3LDIxLjM2NCAzMC45NTMsMjEuMDUgTDI5LjI1LDIyLjc1NCBMMjcuODM2LDIxLjM0IEwyOS45NDYsMTkuMjI4IEMzMC4yMTQsMTguOTU5IDMwLjYxMywxOC44NjcgMzAuOTc2LDE4Ljk4OSBDMzIuMDAxLDE5LjM0IDMzLjEwOSwxOS4wODEgMzMuODcyLDE4LjMxOSBDMzQuMzE1LDE3Ljg3NiAzNC41ODQsMTcuMzExIDM0LjY2NiwxNi43MiBMMzMuODIxLDE3LjU2NCBDMzMuNjMzLDE3Ljc1MiAzMy4zNzksMTcuODU3IDMzLjExNCwxNy44NTcgTDMzLjExMywxNy44NTcgQzMyLjg0NywxNy44NTcgMzIuNTkzLDE3Ljc1MiAzMi40MDYsMTcuNTYzIEwzMC42NjUsMTUuODE3IEMzMC4yNzUsMTUuNDI3IDMwLjI3NSwxNC43OTQgMzAuNjY2LDE0LjQwNCBMMzEuNTA1LDEzLjU2NCBDMzAuOTEzLDEzLjY0NiAzMC4zNDgsMTMuOTE2IDI5LjkwNiwxNC4zNTggQzI5LjE1NSwxNS4xMDkgMjguODkyLDE2LjI0NCAyOS4yMzYsMTcuMjQ4IEMyOS4zNTksMTcuNjA5IDI5LjI2NiwxOC4wMSAyOC45OTcsMTguMjc5IEwyNS4yNjEsMjIuMDE1IEwyMy44NDcsMjAuNiBMMjcuMTc2LDE3LjI3MSBaIE0yMi44MjgsMjkuMTggTDIxLjEyNCwzMC44ODUgQzIxLjQyNSwzMi40MzggMjAuOTM4LDM0LjA4MiAxOS44LDM1LjIxMyBDMTguODg0LDM2LjEzNCAxNy42NTgsMzYuNjE5IDE2LjQxNCwzNi42MTkgQzE1LjY5NiwzNi42MTkgMTQuOTcxLDM2LjQ1OCAxNC4yOTYsMzYuMTI2IEMxNC4wMDcsMzUuOTgzIDEzLjgwNCwzNS43MSAxMy43NTEsMzUuMzkxIEMxMy42OTksMzUuMDczIDEzLjgwMiwzNC43NDkgMTQuMDMxLDM0LjUyMSBMMTUuNTEyLDMzLjA0IEwxNS4xODUsMzIuNzEzIEwxMy43MDQsMzQuMTk0IEMxMy40NzUsMzQuNDIzIDEzLjE0NywzNC41MjQgMTIuODM0LDM0LjQ3NCBDMTIuNTE1LDM0LjQyMSAxMi4yNDIsMzQuMjE4IDEyLjA5OSwzMy45MjkgQzExLjE5MywzMi4wODggMTEuNTYxLDI5Ljg3NSAxMy4wMTQsMjguNDIzIEMxNC4xNDcsMjcuMjg1IDE1Ljc5LDI2Ljc5OSAxNy4zNDEsMjcuMTA1IEwyMC42NzQsMjMuNzczIEwyMi4wODgsMjUuMTg3IEwxOC4zNDgsMjguOTI3IEMxOC4wNzgsMjkuMTk3IDE3LjY3NSwyOS4yOSAxNy4zMTUsMjkuMTY1IEMxNi4zMTIsMjguODE3IDE1LjE3OSwyOS4wOCAxNC40MywyOS44MzUgQzEzLjk4NSwzMC4yNzkgMTMuNzE0LDMwLjg0NSAxMy42MzMsMzEuNDM2IEwxNC40NzgsMzAuNTkyIEMxNC44NjksMzAuMjAxIDE1LjUwMSwzMC4yMDEgMTUuODkyLDMwLjU5MiBMMTcuNjMzLDMyLjMzMyBDMTguMDI0LDMyLjcyNCAxOC4wMjQsMzMuMzU2IDE3LjYzMywzMy43NDcgTDE2Ljc4NywzNC41OTQgQzE3LjM3OSwzNC41MTQgMTcuOTQ0LDM0LjI0MyAxOC4zODYsMzMuNzk5IEMxOS4xNDMsMzMuMDQ2IDE5LjQwOCwzMS45MTMgMTkuMDY0LDMwLjkwNyBDMTguOTQxLDMwLjU0NyAxOS4wMzQsMzAuMTQ2IDE5LjMwMywyOS44NzcgTDIxLjQxNCwyNy43NjYgTDIyLjgyOCwyOS4xOCBaIE00MS4yNDMsMzQuMDA4IEwyNC4wOTUsNDMuODQ2IEw3LjAwMywzMy45MTUgTDcuMDU3LDE0LjE0NiBMMjQuMjA0LDQuMzA4IEw0MS4yOTUsMTQuMjQgTDQxLjI0MywzNC4wMDggWiBNMjQuMjA5LDIgTDUuMDYxLDEyLjk4NiBMNSwzNS4wNjMgTDI0LjA4OSw0Ni4xNTQgTDQzLjIzOSwzNS4xNjggTDQzLjI5OSwxMy4wOTIgTDI0LjIwOSwyIFoiIGlkPSJGaWxsLTE5IiBmaWxsPSIjMjMyRjNEIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPg=="></image>
+<image id="ic-tools-d" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19Ub29sa2l0XzQ4X0Rhcms8L3RpdGxlPgogICAgPGcgaWQ9Ikljb24tUmVzb3VyY2UvR2VuZXJhbC1SZXNvdXJjZS9SZXNfVG9vbGtpdF80OCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTMyLjQzOCwzNC4yMDMgTDI1LjEyLDI2Ljg4NCBMMjYuOTU3LDI1LjA0NyBMMzQuMjc1LDMyLjM2NiBMMzIuNDM4LDM0LjIwMyBaIE0xMy45MjIsMTQuMjAxIEwxNC4yNzMsMTMuODUgTDE3LjExNywxNS45MjQgTDE1Ljk5NiwxNy4wNDUgTDEzLjkyMiwxNC4yMDEgWiBNMjcuNjY0LDIyLjkyNiBDMjcuMjg5LDIyLjU1MSAyNi42MjUsMjIuNTUxIDI2LjI1LDIyLjkyNiBMMjUuMzMxLDIzLjg0NSBMMTguNjc3LDE3LjE5MSBMMTkuMzU3LDE2LjUxMiBDMTkuNTY0LDE2LjMwNSAxOS42NjksMTYuMDE4IDE5LjY0NywxNS43MjcgQzE5LjYyNSwxNS40MzUgMTkuNDc1LDE1LjE2OSAxOS4yMzksMTQuOTk3IEwxNC43NTksMTEuNzMgQzE0LjM2MiwxMS40NDEgMTMuODEyLDExLjQ4MyAxMy40NjMsMTEuODMxIEwxMS45MDMsMTMuMzkxIEMxMS41NTQsMTMuNzQgMTEuNTExLDE0LjI5IDExLjgwMiwxNC42ODcgTDE1LjA2OSwxOS4xNjcgQzE1LjI0MSwxOS40MDMgMTUuNTA3LDE5LjU1MyAxNS43OTksMTkuNTc1IEMxNS44MjUsMTkuNTc3IDE1Ljg1MSwxOS41NzggMTUuODc2LDE5LjU3OCBDMTYuMTQxLDE5LjU3OCAxNi4zOTUsMTkuNDc0IDE2LjU4NCwxOS4yODUgTDE3LjI2MywxOC42MDUgTDIzLjkxNywyNS4yNTkgTDIyLjk5OSwyNi4xNzcgQzIyLjYwOCwyNi41NjcgMjIuNjA4LDI3LjIgMjIuOTk5LDI3LjU5MSBMMzEuNzMxLDM2LjMyNCBDMzEuOTE4LDM2LjUxMiAzMi4xNzIsMzYuNjE3IDMyLjQzOCwzNi42MTcgQzMyLjcwNCwzNi42MTcgMzIuOTU4LDM2LjUxMiAzMy4xNDUsMzYuMzI0IEwzNi4zOTYsMzMuMDczIEMzNi43ODcsMzIuNjgyIDM2Ljc4NywzMi4wNSAzNi4zOTYsMzEuNjU5IEwyNy42NjQsMjIuOTI2IFogTTI3LjE3NiwxNy4yNzEgQzI2Ljg3NCwxNS43MiAyNy4zNTksMTQuMDc3IDI4LjQ5MiwxMi45NDQgQzI5LjkzOSwxMS40OTQgMzIuMTU0LDExLjEyNSAzNCwxMi4wMjIgQzM0LjI5LDEyLjE2NCAzNC40OTUsMTIuNDM3IDM0LjU0OCwxMi43NTYgQzM0LjYwMiwxMy4wNzUgMzQuNDk4LDEzLjQgMzQuMjY5LDEzLjYyOSBMMzIuNzg2LDE1LjExMiBMMzMuMTE1LDE1LjQ0MiBMMzQuNTk2LDEzLjk2MSBDMzQuODI1LDEzLjczMiAzNS4xNDksMTMuNjI5IDM1LjQ2NywxMy42ODIgQzM1Ljc4NiwxMy43MzQgMzYuMDU5LDEzLjkzNyAzNi4yMDEsMTQuMjI3IEMzNy4xMDUsMTYuMDY5IDM2LjczOCwxOC4yODIgMzUuMjg2LDE5LjczMyBDMzQuMTMzLDIwLjg4NiAzMi41MTcsMjEuMzY0IDMwLjk1MywyMS4wNSBMMjkuMjUsMjIuNzU0IEwyNy44MzYsMjEuMzQgTDI5Ljk0NiwxOS4yMjggQzMwLjIxNCwxOC45NTkgMzAuNjEzLDE4Ljg2NyAzMC45NzYsMTguOTg5IEMzMi4wMDEsMTkuMzQgMzMuMTA5LDE5LjA4MSAzMy44NzIsMTguMzE5IEMzNC4zMTUsMTcuODc2IDM0LjU4NCwxNy4zMTEgMzQuNjY2LDE2LjcyIEwzMy44MjEsMTcuNTY0IEMzMy42MzMsMTcuNzUyIDMzLjM3OSwxNy44NTcgMzMuMTE0LDE3Ljg1NyBMMzMuMTEzLDE3Ljg1NyBDMzIuODQ3LDE3Ljg1NyAzMi41OTMsMTcuNzUyIDMyLjQwNiwxNy41NjMgTDMwLjY2NSwxNS44MTcgQzMwLjI3NSwxNS40MjcgMzAuMjc1LDE0Ljc5NCAzMC42NjYsMTQuNDA0IEwzMS41MDUsMTMuNTY0IEMzMC45MTMsMTMuNjQ2IDMwLjM0OCwxMy45MTYgMjkuOTA2LDE0LjM1OCBDMjkuMTU1LDE1LjEwOSAyOC44OTIsMTYuMjQ0IDI5LjIzNiwxNy4yNDggQzI5LjM1OSwxNy42MDkgMjkuMjY2LDE4LjAxIDI4Ljk5NywxOC4yNzkgTDI1LjI2MSwyMi4wMTUgTDIzLjg0NywyMC42IEwyNy4xNzYsMTcuMjcxIFogTTIyLjgyOCwyOS4xOCBMMjEuMTI0LDMwLjg4NSBDMjEuNDI1LDMyLjQzOCAyMC45MzgsMzQuMDgyIDE5LjgsMzUuMjEzIEMxOC44ODQsMzYuMTM0IDE3LjY1OCwzNi42MTkgMTYuNDE0LDM2LjYxOSBDMTUuNjk2LDM2LjYxOSAxNC45NzEsMzYuNDU4IDE0LjI5NiwzNi4xMjYgQzE0LjAwNywzNS45ODMgMTMuODA0LDM1LjcxIDEzLjc1MSwzNS4zOTEgQzEzLjY5OSwzNS4wNzMgMTMuODAyLDM0Ljc0OSAxNC4wMzEsMzQuNTIxIEwxNS41MTIsMzMuMDQgTDE1LjE4NSwzMi43MTMgTDEzLjcwNCwzNC4xOTQgQzEzLjQ3NSwzNC40MjMgMTMuMTQ3LDM0LjUyNCAxMi44MzQsMzQuNDc0IEMxMi41MTUsMzQuNDIxIDEyLjI0MiwzNC4yMTggMTIuMDk5LDMzLjkyOSBDMTEuMTkzLDMyLjA4OCAxMS41NjEsMjkuODc1IDEzLjAxNCwyOC40MjMgQzE0LjE0NywyNy4yODUgMTUuNzksMjYuNzk5IDE3LjM0MSwyNy4xMDUgTDIwLjY3NCwyMy43NzMgTDIyLjA4OCwyNS4xODcgTDE4LjM0OCwyOC45MjcgQzE4LjA3OCwyOS4xOTcgMTcuNjc1LDI5LjI5IDE3LjMxNSwyOS4xNjUgQzE2LjMxMiwyOC44MTcgMTUuMTc5LDI5LjA4IDE0LjQzLDI5LjgzNSBDMTMuOTg1LDMwLjI3OSAxMy43MTQsMzAuODQ1IDEzLjYzMywzMS40MzYgTDE0LjQ3OCwzMC41OTIgQzE0Ljg2OSwzMC4yMDEgMTUuNTAxLDMwLjIwMSAxNS44OTIsMzAuNTkyIEwxNy42MzMsMzIuMzMzIEMxOC4wMjQsMzIuNzI0IDE4LjAyNCwzMy4zNTYgMTcuNjMzLDMzLjc0NyBMMTYuNzg3LDM0LjU5NCBDMTcuMzc5LDM0LjUxNCAxNy45NDQsMzQuMjQzIDE4LjM4NiwzMy43OTkgQzE5LjE0MywzMy4wNDYgMTkuNDA4LDMxLjkxMyAxOS4wNjQsMzAuOTA3IEMxOC45NDEsMzAuNTQ3IDE5LjAzNCwzMC4xNDYgMTkuMzAzLDI5Ljg3NyBMMjEuNDE0LDI3Ljc2NiBMMjIuODI4LDI5LjE4IFogTTQxLjI0MywzNC4wMDggTDI0LjA5NSw0My44NDYgTDcuMDAzLDMzLjkxNSBMNy4wNTcsMTQuMTQ2IEwyNC4yMDQsNC4zMDggTDQxLjI5NSwxNC4yNCBMNDEuMjQzLDM0LjAwOCBaIE0yNC4yMDksMiBMNS4wNjEsMTIuOTg2IEw1LDM1LjA2MyBMMjQuMDg5LDQ2LjE1NCBMNDMuMjM5LDM1LjE2OCBMNDMuMjk5LDEzLjA5MiBMMjQuMjA5LDIgWiIgaWQ9IkZpbGwtMTkiIGZpbGw9IiNGRkZGRkYiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+"></image>
+<image id="ic-db-l" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19EYXRhYmFzZV80OF9MaWdodDwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19EYXRhYmFzZV80OCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTMxLjc1NSw0My4zMDcgQzMwLjUwNiw0My41MTkgMjkuMTc2LDQzLjY3NyAyNy44MDEsNDMuNzc3IEMyNy4yNDQsNDMuODE3IDI2LjY3OCw0My44NDcgMjYuMTA1LDQzLjg2OSBDMjQuOTU0LDQzLjkwOCAyMy43NTQsNDMuOTA4IDIyLjYwOCw0My44NjkgQzIyLjAzMyw0My44NDcgMjEuNDY3LDQzLjgxNyAyMC45MSw0My43NzcgQzE5LjUzNSw0My42NzcgMTguMjA1LDQzLjUxOSAxNi45NTYsNDMuMzA3IEMxMi4wNDksNDIuNDc1IDksNDAuNzMgOSwzOC43NTQgTDksMTAuNzY1IEMxMS45OTcsMTIuNjYxIDE3Ljc0LDEzLjg0MSAyNC4zNTYsMTMuODQxIEMzMC45NjYsMTMuODQxIDM2LjYzNiwxMi42OCAzOS42NDUsMTAuODAzIEwzOS42NDUsMzguNzU0IEMzOS42NDUsNDAuNzY3IDM2LjY5NSw0Mi40NjkgMzEuNzU1LDQzLjMwNyBNMjQuMzU2LDQgQzMyLjg5Niw0IDM4LjQ3Niw2LjE4NCAzOS40Nyw4LjQzMiBDMzcuODAyLDEwLjA5OCAzMi40NiwxMS44NDEgMjQuMzU2LDExLjg0MSBDMTYuMjYsMTEuODQxIDEwLjgyOCwxMC4wNjEgOS4yMDcsOC40MDggTDkuMTcxLDguNDQzIEMxMC4xNTUsNi4xOTEgMTUuNzY1LDQgMjQuMzU2LDQgTTI0LjM1NiwyIEMxNC4xMzcsMiA3LDQuOTM4IDcsOS4xNDUgTDcsMzguNzU0IEM3LDQwLjU4MSA4LjI1LDQzLjg2IDE2LjYyMiw0NS4yOCBDMTcuOTMzLDQ1LjUwMSAxOS4zMjcsNDUuNjY3IDIwLjc2Niw0NS43NzEgQzIxLjM0Niw0NS44MTMgMjEuOTM2LDQ1Ljg0NSAyMi41MzYsNDUuODY3IEMyMy4xMzQsNDUuODg4IDIzLjc0MSw0NS44OTkgMjQuMzU2LDQ1Ljg5OSBDMjQuOTcsNDUuODk5IDI1LjU3Niw0NS44ODggMjYuMTc2LDQ1Ljg2NyBDMjYuNzc2LDQ1Ljg0NSAyNy4zNjUsNDUuODEzIDI3Ljk0NSw0NS43NzEgQzI5LjM4NCw0NS42NjcgMzAuNzc4LDQ1LjUwMSAzMi4wODksNDUuMjggQzQwLjQwMyw0My44NjkgNDEuNjQ1LDQwLjU4NiA0MS42NDUsMzguNzU0IEw0MS42NDUsOS4xNDUgQzQxLjY0NSw0LjkzOCAzNC41MzUsMiAyNC4zNTYsMiIgaWQ9IkZpbGwtOSIgZmlsbD0iIzIzMkYzRCI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4="></image>
+<image id="ic-db-d" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19HZW5lcmljLWRhdGFiYXNlXzQ4X0Rhcms8L3RpdGxlPgogICAgPGcgaWQ9Ikljb24tUmVzb3VyY2UvR2VuZXJhbC1SZXNvdXJjZS9SZXNfR2VuZXJpYy1kYXRhYmFzZV80OCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTMxLjc1NSw0My4zMDcgQzMwLjUwNiw0My41MTkgMjkuMTc2LDQzLjY3NyAyNy44MDEsNDMuNzc3IEMyNy4yNDQsNDMuODE3IDI2LjY3OCw0My44NDcgMjYuMTA1LDQzLjg2OSBDMjQuOTU0LDQzLjkwOCAyMy43NTQsNDMuOTA4IDIyLjYwOCw0My44NjkgQzIyLjAzMyw0My44NDcgMjEuNDY3LDQzLjgxNyAyMC45MSw0My43NzcgQzE5LjUzNSw0My42NzcgMTguMjA1LDQzLjUxOSAxNi45NTYsNDMuMzA3IEMxMi4wNDksNDIuNDc1IDksNDAuNzMgOSwzOC43NTQgTDksMTAuNzY1IEMxMS45OTcsMTIuNjYxIDE3Ljc0LDEzLjg0MSAyNC4zNTYsMTMuODQxIEMzMC45NjYsMTMuODQxIDM2LjYzNiwxMi42OCAzOS42NDUsMTAuODAzIEwzOS42NDUsMzguNzU0IEMzOS42NDUsNDAuNzY3IDM2LjY5NSw0Mi40NjkgMzEuNzU1LDQzLjMwNyBNMjQuMzU2LDQgQzMyLjg5Niw0IDM4LjQ3Niw2LjE4NCAzOS40Nyw4LjQzMiBDMzcuODAyLDEwLjA5OCAzMi40NiwxMS44NDEgMjQuMzU2LDExLjg0MSBDMTYuMjYsMTEuODQxIDEwLjgyOCwxMC4wNjEgOS4yMDcsOC40MDggTDkuMTcxLDguNDQzIEMxMC4xNTUsNi4xOTEgMTUuNzY1LDQgMjQuMzU2LDQgTTI0LjM1NiwyIEMxNC4xMzcsMiA3LDQuOTM4IDcsOS4xNDUgTDcsMzguNzU0IEM3LDQwLjU4MSA4LjI1LDQzLjg2IDE2LjYyMiw0NS4yOCBDMTcuOTMzLDQ1LjUwMSAxOS4zMjcsNDUuNjY3IDIwLjc2Niw0NS43NzEgQzIxLjM0Niw0NS44MTMgMjEuOTM2LDQ1Ljg0NSAyMi41MzYsNDUuODY3IEMyMy4xMzQsNDUuODg4IDIzLjc0MSw0NS44OTkgMjQuMzU2LDQ1Ljg5OSBDMjQuOTcsNDUuODk5IDI1LjU3Niw0NS44ODggMjYuMTc2LDQ1Ljg2NyBDMjYuNzc2LDQ1Ljg0NSAyNy4zNjUsNDUuODEzIDI3Ljk0NSw0NS43NzEgQzI5LjM4NCw0NS42NjcgMzAuNzc4LDQ1LjUwMSAzMi4wODksNDUuMjggQzQwLjQwMyw0My44NjkgNDEuNjQ1LDQwLjU4NiA0MS42NDUsMzguNzU0IEw0MS42NDUsOS4xNDUgQzQxLjY0NSw0LjkzOCAzNC41MzUsMiAyNC4zNTYsMiIgaWQ9IkZpbGwtOSIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4="></image>
+<image id="ic-claude-l" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19DaGF0XzQ4X0xpZ2h0PC90aXRsZT4KICAgIDxnIGlkPSJJY29uLVJlc291cmNlL0dlbmVyYWwtUmVzb3VyY2UvUmVzX0NoYXRfNDgiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxwYXRoIGQ9Ik0zNiwyMS45OTk2IEMzNC44OTcsMjEuOTk5NiAzNCwyMS4xMDI2IDM0LDE5Ljk5OTYgQzM0LDE4Ljg5NjYgMzQuODk3LDE3Ljk5OTYgMzYsMTcuOTk5NiBDMzcuMTAzLDE3Ljk5OTYgMzgsMTguODk2NiAzOCwxOS45OTk2IEMzOCwyMS4xMDI2IDM3LjEwMywyMS45OTk2IDM2LDIxLjk5OTYgTDM2LDIxLjk5OTYgWiBNMzYsMTUuOTk5NiBDMzMuNzk0LDE1Ljk5OTYgMzIsMTcuNzkzNiAzMiwxOS45OTk2IEMzMiwyMi4yMDU2IDMzLjc5NCwyMy45OTk2IDM2LDIzLjk5OTYgQzM4LjIwNiwyMy45OTk2IDQwLDIyLjIwNTYgNDAsMTkuOTk5NiBDNDAsMTcuNzkzNiAzOC4yMDYsMTUuOTk5NiAzNiwxNS45OTk2IEwzNiwxNS45OTk2IFogTTI0LDIxLjk5OTYgQzIyLjg5NywyMS45OTk2IDIyLDIxLjEwMjYgMjIsMTkuOTk5NiBDMjIsMTguODk2NiAyMi44OTcsMTcuOTk5NiAyNCwxNy45OTk2IEMyNS4xMDMsMTcuOTk5NiAyNiwxOC44OTY2IDI2LDE5Ljk5OTYgQzI2LDIxLjEwMjYgMjUuMTAzLDIxLjk5OTYgMjQsMjEuOTk5NiBMMjQsMjEuOTk5NiBaIE0yNCwxNS45OTk2IEMyMS43OTQsMTUuOTk5NiAyMCwxNy43OTM2IDIwLDE5Ljk5OTYgQzIwLDIyLjIwNTYgMjEuNzk0LDIzLjk5OTYgMjQsMjMuOTk5NiBDMjYuMjA2LDIzLjk5OTYgMjgsMjIuMjA1NiAyOCwxOS45OTk2IEMyOCwxNy43OTM2IDI2LjIwNiwxNS45OTk2IDI0LDE1Ljk5OTYgTDI0LDE1Ljk5OTYgWiBNMTIsMjEuOTk5NiBDMTAuODk3LDIxLjk5OTYgMTAsMjEuMTAyNiAxMCwxOS45OTk2IEMxMCwxOC44OTY2IDEwLjg5NywxNy45OTk2IDEyLDE3Ljk5OTYgQzEzLjEwMywxNy45OTk2IDE0LDE4Ljg5NjYgMTQsMTkuOTk5NiBDMTQsMjEuMTAyNiAxMy4xMDMsMjEuOTk5NiAxMiwyMS45OTk2IEwxMiwyMS45OTk2IFogTTEyLDE1Ljk5OTYgQzkuNzk0LDE1Ljk5OTYgOCwxNy43OTM2IDgsMTkuOTk5NiBDOCwyMi4yMDU2IDkuNzk0LDIzLjk5OTYgMTIsMjMuOTk5NiBDMTQuMjA2LDIzLjk5OTYgMTYsMjIuMjA1NiAxNiwxOS45OTk2IEMxNiwxNy43OTM2IDE0LjIwNiwxNS45OTk2IDEyLDE1Ljk5OTYgTDEyLDE1Ljk5OTYgWiBNNDQsMzIuOTQ5NiBDNDQsMzQuMDgwNiA0My4xNjMsMzQuOTk5NiA0Mi4xMjEsMzQuOTk5NiBMMzcuOTg4LDM1LjA1MDYgQzM3LjQ0LDM1LjA1NzYgMzcsMzUuNTAzNiAzNywzNi4wNTA2IEwzNyw0MC4yODg2IEwzMS40NTUsMzUuMjU4NiBDMzEuMjcxLDM1LjA5MjYgMzEuMDMzLDM0Ljk5OTYgMzAuNzg1LDM0Ljk5OTYgTDYsMzQuOTk5NiBDNC44MzEsMzQuOTk5NiA0LDM0LjAzMDYgNCwzMi45MDM2IEw0LDkuMDI4NiBDNCw3LjkwOTYgNC45MSw2Ljk5OTYgNi4wMjksNi45OTk2IEw0MS45NzEsNi45OTk2IEM0My4wOSw2Ljk5OTYgNDQsNy45MDk2IDQ0LDkuMDI4NiBMNDQsMzIuOTQ5NiBaIE00MS45NzEsNC45OTk2IEw2LjAyOSw0Ljk5OTYgQzMuODA3LDQuOTk5NiAyLDYuODA2NiAyLDkuMDI4NiBMMiwzMi45MDM2IEMyLDM1LjEzMzYgMy44NDgsMzYuOTQ4NiA2LjExOCwzNi45NDg2IEwzMC4zOTYsMzYuOTk4NiBMMzcuMzI4LDQzLjI4NjYgQzM3LjUxNiw0My40NTc2IDM3Ljc1Niw0My41NDU2IDM4LDQzLjU0NTYgQzM4LjEzNyw0My41NDU2IDM4LjI3NSw0My41MTc2IDM4LjQwNSw0My40NTk2IEMzOC43NjcsNDMuMjk5NiAzOSw0Mi45NDE2IDM5LDQyLjU0NTYgTDM5LDM3LjAzODYgTDQyLjEzMywzNi45OTk2IEM0NC4yNjUsMzYuOTk5NiA0NiwzNS4xODI2IDQ2LDMyLjk0OTYgTDQ2LDkuMDI4NiBDNDYsNi44MDY2IDQ0LjE5Myw0Ljk5OTYgNDEuOTcxLDQuOTk5NiBMNDEuOTcxLDQuOTk5NiBaIiBpZD0iRmlsbC0xIiBmaWxsPSIjMjMyRjNEIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPg=="></image>
+<image id="ic-claude-d" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19DaGF0XzQ4X0Rhcms8L3RpdGxlPgogICAgPGcgaWQ9Ikljb24tUmVzb3VyY2UvR2VuZXJhbC1SZXNvdXJjZS9SZXNfQ2hhdF80OCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTM2LDIxLjk5OTYgQzM0Ljg5NywyMS45OTk2IDM0LDIxLjEwMjYgMzQsMTkuOTk5NiBDMzQsMTguODk2NiAzNC44OTcsMTcuOTk5NiAzNiwxNy45OTk2IEMzNy4xMDMsMTcuOTk5NiAzOCwxOC44OTY2IDM4LDE5Ljk5OTYgQzM4LDIxLjEwMjYgMzcuMTAzLDIxLjk5OTYgMzYsMjEuOTk5NiBMMzYsMjEuOTk5NiBaIE0zNiwxNS45OTk2IEMzMy43OTQsMTUuOTk5NiAzMiwxNy43OTM2IDMyLDE5Ljk5OTYgQzMyLDIyLjIwNTYgMzMuNzk0LDIzLjk5OTYgMzYsMjMuOTk5NiBDMzguMjA2LDIzLjk5OTYgNDAsMjIuMjA1NiA0MCwxOS45OTk2IEM0MCwxNy43OTM2IDM4LjIwNiwxNS45OTk2IDM2LDE1Ljk5OTYgTDM2LDE1Ljk5OTYgWiBNMjQsMjEuOTk5NiBDMjIuODk3LDIxLjk5OTYgMjIsMjEuMTAyNiAyMiwxOS45OTk2IEMyMiwxOC44OTY2IDIyLjg5NywxNy45OTk2IDI0LDE3Ljk5OTYgQzI1LjEwMywxNy45OTk2IDI2LDE4Ljg5NjYgMjYsMTkuOTk5NiBDMjYsMjEuMTAyNiAyNS4xMDMsMjEuOTk5NiAyNCwyMS45OTk2IEwyNCwyMS45OTk2IFogTTI0LDE1Ljk5OTYgQzIxLjc5NCwxNS45OTk2IDIwLDE3Ljc5MzYgMjAsMTkuOTk5NiBDMjAsMjIuMjA1NiAyMS43OTQsMjMuOTk5NiAyNCwyMy45OTk2IEMyNi4yMDYsMjMuOTk5NiAyOCwyMi4yMDU2IDI4LDE5Ljk5OTYgQzI4LDE3Ljc5MzYgMjYuMjA2LDE1Ljk5OTYgMjQsMTUuOTk5NiBMMjQsMTUuOTk5NiBaIE0xMiwyMS45OTk2IEMxMC44OTcsMjEuOTk5NiAxMCwyMS4xMDI2IDEwLDE5Ljk5OTYgQzEwLDE4Ljg5NjYgMTAuODk3LDE3Ljk5OTYgMTIsMTcuOTk5NiBDMTMuMTAzLDE3Ljk5OTYgMTQsMTguODk2NiAxNCwxOS45OTk2IEMxNCwyMS4xMDI2IDEzLjEwMywyMS45OTk2IDEyLDIxLjk5OTYgTDEyLDIxLjk5OTYgWiBNMTIsMTUuOTk5NiBDOS43OTQsMTUuOTk5NiA4LDE3Ljc5MzYgOCwxOS45OTk2IEM4LDIyLjIwNTYgOS43OTQsMjMuOTk5NiAxMiwyMy45OTk2IEMxNC4yMDYsMjMuOTk5NiAxNiwyMi4yMDU2IDE2LDE5Ljk5OTYgQzE2LDE3Ljc5MzYgMTQuMjA2LDE1Ljk5OTYgMTIsMTUuOTk5NiBMMTIsMTUuOTk5NiBaIE00NCwzMi45NDk2IEM0NCwzNC4wODA2IDQzLjE2MywzNC45OTk2IDQyLjEyMSwzNC45OTk2IEwzNy45ODgsMzUuMDUwNiBDMzcuNDQsMzUuMDU3NiAzNywzNS41MDM2IDM3LDM2LjA1MDYgTDM3LDQwLjI4ODYgTDMxLjQ1NSwzNS4yNTg2IEMzMS4yNzEsMzUuMDkyNiAzMS4wMzMsMzQuOTk5NiAzMC43ODUsMzQuOTk5NiBMNiwzNC45OTk2IEM0LjgzMSwzNC45OTk2IDQsMzQuMDMwNiA0LDMyLjkwMzYgTDQsOS4wMjg2IEM0LDcuOTA5NiA0LjkxLDYuOTk5NiA2LjAyOSw2Ljk5OTYgTDQxLjk3MSw2Ljk5OTYgQzQzLjA5LDYuOTk5NiA0NCw3LjkwOTYgNDQsOS4wMjg2IEw0NCwzMi45NDk2IFogTTQxLjk3MSw0Ljk5OTYgTDYuMDI5LDQuOTk5NiBDMy44MDcsNC45OTk2IDIsNi44MDY2IDIsOS4wMjg2IEwyLDMyLjkwMzYgQzIsMzUuMTMzNiAzLjg0OCwzNi45NDg2IDYuMTE4LDM2Ljk0ODYgTDMwLjM5NiwzNi45OTg2IEwzNy4zMjgsNDMuMjg2NiBDMzcuNTE2LDQzLjQ1NzYgMzcuNzU2LDQzLjU0NTYgMzgsNDMuNTQ1NiBDMzguMTM3LDQzLjU0NTYgMzguMjc1LDQzLjUxNzYgMzguNDA1LDQzLjQ1OTYgQzM4Ljc2Nyw0My4yOTk2IDM5LDQyLjk0MTYgMzksNDIuNTQ1NiBMMzksMzcuMDM4NiBMNDIuMTMzLDM2Ljk5OTYgQzQ0LjI2NSwzNi45OTk2IDQ2LDM1LjE4MjYgNDYsMzIuOTQ5NiBMNDYsOS4wMjg2IEM0Niw2LjgwNjYgNDQuMTkzLDQuOTk5NiA0MS45NzEsNC45OTk2IEw0MS45NzEsNC45OTk2IFoiIGlkPSJGaWxsLTEiIGZpbGw9IiNGRkZGRkYiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+"></image>
+<image id="ic-srv-l" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19UcmFkaXRpb25hbC1zZXJ2ZXJfNDhfTGlnaHQ8L3RpdGxlPgogICAgPGcgaWQ9Ikljb24tUmVzb3VyY2UvR2VuZXJhbC1SZXNvdXJjZS9SZXNfVHJhZGl0aW9uYWwtc2VydmVyXzQ4IiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8cGF0aCBkPSJNMTUuNDM3LDIxLjUyIEwzMi4wNjQsMjEuNTIgTDMyLjA2NCwxOS41MiBMMTUuNDM3LDE5LjUyIEwxNS40MzcsMjEuNTIgWiBNMTUuNDM3LDE3LjE5NiBMMzIuMDY0LDE3LjE5NiBMMzIuMDY0LDE1LjE5NiBMMTUuNDM3LDE1LjE5NiBMMTUuNDM3LDE3LjE5NiBaIE0xNS40MzcsMTIuNzYyIEwzMi4wNjQsMTIuNzYyIEwzMi4wNjQsMTAuNzYyIEwxNS40MzcsMTAuNzYyIEwxNS40MzcsMTIuNzYyIFogTTE1LjQzNyw4LjQ5NCBMMzIuMDY0LDguNDk0IEwzMi4wNjQsNi40OTQgTDE1LjQzNyw2LjQ5NCBMMTUuNDM3LDguNDk0IFogTTEzLDQ0LjAxMyBMMzQuNDk5LDQ0LjAxMyBMMzQuNDk5LDQgTDEzLDQgTDEzLDQ0LjAxMyBaIE0zNS4wMzIsMiBMMTIuNDY4LDIgQzExLjY1OSwyIDExLDIuNjU5IDExLDMuNDY5IEwxMSw0NC41NDUgQzExLDQ1LjM1NSAxMS42NTksNDYuMDEzIDEyLjQ2OCw0Ni4wMTMgTDM1LjAzMiw0Ni4wMTMgQzM1Ljg0MSw0Ni4wMTMgMzYuNDk5LDQ1LjM1NSAzNi40OTksNDQuNTQ1IEwzNi40OTksMy40NjkgQzM2LjQ5OSwyLjY1OSAzNS44NDEsMiAzNS4wMzIsMiBMMzUuMDMyLDIgWiIgaWQ9IkZpbGwtMTgiIGZpbGw9IiMyMzJGM0QiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+"></image>
+<image id="ic-srv-d" width="48" height="48" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgNDggNDgiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19UcmFkaXRpb25hbC1zZXJ2ZXJfNDhfRGFyazwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbi1SZXNvdXJjZS9HZW5lcmFsLVJlc291cmNlL1Jlc19UcmFkaXRpb25hbC1zZXJ2ZXJfNDgiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxwYXRoIGQ9Ik0xNS40MzcsMjEuNTIgTDMyLjA2NCwyMS41MiBMMzIuMDY0LDE5LjUyIEwxNS40MzcsMTkuNTIgTDE1LjQzNywyMS41MiBaIE0xNS40MzcsMTcuMTk2IEwzMi4wNjQsMTcuMTk2IEwzMi4wNjQsMTUuMTk2IEwxNS40MzcsMTUuMTk2IEwxNS40MzcsMTcuMTk2IFogTTE1LjQzNywxMi43NjIgTDMyLjA2NCwxMi43NjIgTDMyLjA2NCwxMC43NjIgTDE1LjQzNywxMC43NjIgTDE1LjQzNywxMi43NjIgWiBNMTUuNDM3LDguNDk0IEwzMi4wNjQsOC40OTQgTDMyLjA2NCw2LjQ5NCBMMTUuNDM3LDYuNDk0IEwxNS40MzcsOC40OTQgWiBNMTMsNDQuMDEzIEwzNC40OTksNDQuMDEzIEwzNC40OTksNCBMMTMsNCBMMTMsNDQuMDEzIFogTTM1LjAzMiwyIEwxMi40NjgsMiBDMTEuNjU5LDIgMTEsMi42NTkgMTEsMy40NjkgTDExLDQ0LjU0NSBDMTEsNDUuMzU1IDExLjY1OSw0Ni4wMTMgMTIuNDY4LDQ2LjAxMyBMMzUuMDMyLDQ2LjAxMyBDMzUuODQxLDQ2LjAxMyAzNi40OTksNDUuMzU1IDM2LjQ5OSw0NC41NDUgTDM2LjQ5OSwzLjQ2OSBDMzYuNDk5LDIuNjU5IDM1Ljg0MSwyIDM1LjAzMiwyIEwzNS4wMzIsMiBaIiBpZD0iRmlsbC0xOCIgZmlsbD0iI0ZGRkZGRiI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4="></image>
+</defs></svg>
+
+<div class="wrap">
+<header>
+  <h1>シナリオ1の解剖 ― カスタマーサポート解決エージェント</h1>
+  <p class="lede">CCAR-F 公式シナリオ1を MCP 抜きで実装した <code>labs/scenario1-no-mcp/</code> の中身。① 何がどこにあるか ② 事故が起きる瞬間 ③ MCP を足すと何が変わるか</p>
+</header>
+
+<h2><span class="n">1</span>何がどこにあるか</h2>
+<p class="claim"><b>主張：全部が1つのプロセスの中にある。外に出るのは <code>DEFS</code>（説明書）だけ。</b></p>
+
+<figure>
+<svg class="diagram" viewBox="0 0 1000 560" role="img" aria-label="MCPなし版の構成">
+  <rect x="16" y="60" width="700" height="400" rx="12" fill="var(--mine-bg2)" stroke="var(--mine)" stroke-width="2.5"/>
+  <rect x="770" y="60" width="214" height="240" rx="12" fill="var(--theirs-bg2)" stroke="var(--theirs)" stroke-width="2" stroke-dasharray="7 5"/>
+
+  <rect x="48" y="110" width="270" height="150" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2.5"/>
+  <g transform="translate(165,122) scale(0.75)"><use class="on-light" href="#ic-tools-l"></use><use class="on-dark" href="#ic-tools-d"></use></g>
+
+  <rect x="48" y="310" width="270" height="120" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="1.6"/>
+  <g transform="translate(168,320) scale(0.625)"><use class="on-light" href="#ic-db-l"></use><use class="on-dark" href="#ic-db-d"></use></g>
+
+  <rect x="400" y="110" width="270" height="150" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2.5"/>
+  <g transform="translate(517,122) scale(0.75)"><use class="on-light" href="#ic-loop-l"></use><use class="on-dark" href="#ic-loop-d"></use></g>
+
+  <rect x="794" y="110" width="166" height="150" rx="9" fill="var(--card)" stroke="var(--theirs)" stroke-width="2" stroke-dasharray="7 5"/>
+  <g transform="translate(859,122) scale(0.75)"><use class="on-light" href="#ic-claude-l"></use><use class="on-dark" href="#ic-claude-d"></use></g>
+
+  <path d="M396 150 L324 150" stroke="var(--mine)" stroke-width="2" fill="none" marker-end="url(#a1)"/>
+  <path d="M396 224 L324 224" stroke="var(--mine)" stroke-width="2" fill="none" marker-end="url(#a1)"/>
+  <path d="M183 260 L183 304" stroke="var(--mine)" stroke-width="1.6" fill="none" marker-end="url(#a1)"/>
+
+  <path d="M670 146 L788 146" stroke="var(--theirs)" stroke-width="2.2" fill="none" marker-end="url(#a2)"/>
+  <path d="M788 200 L676 200" stroke="var(--theirs)" stroke-width="2.2" fill="none" marker-end="url(#a2)"/>
+
+  <rect x="16" y="486" width="968" height="48" rx="8" fill="var(--mine-bg)" stroke="var(--mine)" stroke-width="1.4"/>
+
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--mine)"/></marker>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--theirs)"/></marker>
+  </defs>
+
+        <text class="t-lane" x="32" y="46" fill="var(--mine)">自分の1プロセス（python agent.py）</text>
+        <text class="t-lane" x="786" y="46" fill="var(--theirs)">Anthropic</text>
+        <text class="t-title" x="183" y="182" text-anchor="middle" fill="var(--fg)">tools.py</text>
+        <text class="t-mono" x="183" y="206" text-anchor="middle" fill="var(--mine)">DEFS ＝ 説明書（JSON）</text>
+        <text class="t-sub" x="183" y="222" text-anchor="middle" fill="var(--muted)">名前・description・input_schema</text>
+        <text class="t-mono" x="183" y="242" text-anchor="middle" fill="var(--fg)">IMPL ＝ 実体（Python 関数）</text>
+        <text class="t-title" x="183" y="372" text-anchor="middle" fill="var(--fg)">自社DB（SQLite）</text>
+        <text class="t-sub" x="183" y="392" text-anchor="middle" fill="var(--muted)">db.py → shop.db</text>
+        <text class="t-sub" x="183" y="410" text-anchor="middle" fill="var(--muted)">ただの dict（田中が3人）</text>
+        <text class="t-title" x="535" y="182" text-anchor="middle" fill="var(--fg)">agent.py</text>
+        <text class="t-sub" x="535" y="204" text-anchor="middle" fill="var(--muted)">for turn in range(8) のループ</text>
+        <text class="t-sub" x="535" y="222" text-anchor="middle" fill="var(--muted)">stop_reason を見て分岐</text>
+        <text class="t-sub" x="535" y="242" text-anchor="middle" fill="var(--mine)">ガード A ＝ 実行前の if 検査</text>
+        <text class="t-title" x="877" y="182" text-anchor="middle" fill="var(--fg)">Claude</text>
+        <text class="t-mono" x="877" y="204" text-anchor="middle" fill="var(--muted)">haiku-4-5</text>
+        <text class="t-sub" x="877" y="228" text-anchor="middle" fill="var(--muted)">DEFS しか知らない</text>
+        <text class="t-arrow" x="360" y="140" text-anchor="middle" fill="var(--muted)">DEFS を読む</text>
+        <text class="t-arrow" x="360" y="214" text-anchor="middle" fill="var(--muted)">IMPL[名前](**引数)</text>
+        <text class="t-arrow" x="729" y="112" text-anchor="middle" fill="var(--theirs)">HTTPS</text>
+        <text class="t-arrow" x="729" y="130" text-anchor="middle" fill="var(--theirs)">DEFS ＋ 履歴</text>
+        <text class="t-arrow" x="729" y="220" text-anchor="middle" fill="var(--theirs)">tool_use / end_turn</text>
+        <text class="t-note" x="36" y="508" fill="var(--fg)">境界を越えるのは DEFS（説明書）と会話履歴だけ。IMPL（関数の中身）も自社DBも、プロセスの外には一切出ない。</text>
+        <text class="t-note" x="36" y="526" fill="var(--muted)">だから Claude は「get_customer を呼びたい」と言えるだけで、DB を読むことはできない。</text>
+      </svg>
+<figcaption><code>tools.py</code> の中で <b><code>DEFS</code> と <code>IMPL</code> が別々に置かれている</b>のがこの構成の要。<code>DEFS</code> は Claude に送られ、<code>IMPL</code> は <code>agent.py</code> だけが呼ぶ。</figcaption>
+</figure>
+
+<h2><span class="n">2</span>事故が起きる瞬間</h2>
+<p class="claim"><b>主張：依頼主は田中花子（C-2044・スニーカー・9,800円）。本人確認を飛ばすと田中太郎（C-8831・12,800円）に着地する。</b></p>
+
+<figure>
+<svg class="diagram" viewBox="0 0 1000 576" role="img" aria-label="正しい経路と事故の経路の比較">
+  <rect x="16" y="48" width="452" height="440" rx="12" fill="var(--mine-bg2)" stroke="var(--mine)" stroke-width="2"/>
+  <rect x="524" y="48" width="460" height="440" rx="12" fill="var(--theirs-bg2)" stroke="var(--theirs)" stroke-width="2"/>
+
+  <rect x="36" y="96" width="412" height="104" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.6"/>
+
+  <rect x="544" y="96" width="420" height="104" rx="8" fill="var(--card)" stroke="var(--theirs)" stroke-width="1.6"/>
+
+  <rect x="36" y="238" width="412" height="104" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.6"/>
+
+  <rect x="544" y="238" width="420" height="104" rx="8" fill="var(--card)" stroke="var(--theirs)" stroke-width="1.6"/>
+
+  <rect x="36" y="380" width="412" height="92" rx="8" fill="var(--mine-bg)" stroke="var(--mine)" stroke-width="2"/>
+
+  <rect x="544" y="380" width="420" height="92" rx="8" fill="var(--theirs-bg)" stroke="var(--theirs)" stroke-width="2.6"/>
+
+  <rect x="16" y="512" width="968" height="44" rx="8" fill="var(--card)" stroke="var(--mine)" stroke-width="1.6" stroke-dasharray="6 4"/>
+
+        <text class="t-lane" x="20" y="34" fill="var(--mine)">✅ 正しい経路</text>
+        <text class="t-lane" x="530" y="34" fill="var(--theirs)">⚠ 事故の経路</text>
+        <text class="t-note" x="36" y="80" fill="var(--muted)">依頼：「田中です。スニーカーを返品したい」（email なし）</text>
+        <text class="t-note" x="544" y="80" fill="var(--muted)">依頼：同じ</text>
+        <text class="t-mono" x="52" y="120" fill="var(--fg)">① get_customer(name="田中")</text>
+        <text class="t-sub" x="52" y="144" fill="var(--muted)">→ 3件該当。email が必要</text>
+        <text class="t-mono" x="52" y="166" fill="var(--mine)">verified: false</text>
+        <text class="t-sub" x="52" y="188" fill="var(--fg)">→ verified_id は None のまま</text>
+        <text class="t-mono" x="560" y="120" fill="var(--fg)">① lookup_order(customer_name="田中")</text>
+        <text class="t-sub" x="560" y="144" fill="var(--muted)">→ 候補3人 → cands[0] を採用</text>
+        <text class="t-mono" x="560" y="166" fill="var(--theirs)">guessed: C-8831 田中太郎  ambiguous: true</text>
+        <text class="t-sub" x="560" y="188" fill="var(--fg)">→ O-42 ランニングシューズ 12,800円</text>
+        <text class="t-mono" x="52" y="262" fill="var(--fg)">② email を尋ねる / escalate_to_human</text>
+        <text class="t-sub" x="52" y="286" fill="var(--muted)">本人が特定できないので先へ進まない</text>
+        <text class="t-mono" x="52" y="310" fill="var(--mine)">stop_reason = "end_turn"</text>
+        <text class="t-sub" x="52" y="330" fill="var(--fg)">→ ループ終了</text>
+        <text class="t-mono" x="560" y="262" fill="var(--fg)">② process_refund("O-42")</text>
+        <text class="t-sub" x="560" y="286" fill="var(--muted)">ambiguous: true は読み飛ばされた</text>
+        <text class="t-mono" x="560" y="310" fill="var(--theirs)">refunded: true  to: C-8831</text>
+        <text class="t-sub" x="560" y="330" fill="var(--fg)">→ 12,800円が動いた</text>
+        <text class="t-title" x="52" y="410" fill="var(--fg)">結果：金は動かない</text>
+        <text class="t-sub" x="52" y="434" fill="var(--muted)">解決はしていないが、被害も無い。</text>
+        <text class="t-sub" x="52" y="454" fill="var(--muted)">人間に渡すのが正しい（第9章・ドメイン5）</text>
+        <text class="t-title" x="560" y="410" fill="var(--fg)">結果：別人に 12,800円</text>
+        <text class="t-sub" x="560" y="434" fill="var(--muted)">本人は C-2044／O-77 スニーカー／9,800円</text>
+        <text class="t-sub" x="560" y="454" fill="var(--theirs)">顧客も金額も商品も、すべて違う</text>
+        <text class="t-note" x="36" y="539" fill="var(--fg)">ガード A（agent.py の実行前 if 検査）は、右の経路の ① で lookup_order をブロックする。Claude の判断は変えず、実行だけを止める。</text>
+      </svg>
+<figcaption>左右で違うのは<b>最初の1手だけ</b>。<code>get_customer</code> を呼ぶか <code>lookup_order</code> を呼ぶか、それだけで結末が変わる。公式サンプル問題1が問うているのはこの一手。</figcaption>
+</figure>
+
+<h2><span class="n">3</span>MCP を足すと何が変わるか</h2>
+<p class="claim"><b>主張：変わるのは「ツールがどのプロセスに居るか」だけ。ループも <code>stop_reason</code> も description の重要性も、何も変わらない。</b></p>
+
+<figure>
+<svg class="diagram" viewBox="0 0 1000 480" role="img" aria-label="MCPなし版とMCP版の構成比較">
+
+  <rect x="16" y="48" width="452" height="250" rx="12" fill="var(--mine-bg2)" stroke="var(--mine)" stroke-width="2.5"/>
+  <rect x="44" y="96" width="180" height="110" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2"/>
+  <g transform="translate(119,106) scale(0.625)"><use class="on-light" href="#ic-loop-l"></use><use class="on-dark" href="#ic-loop-d"></use></g>
+  <rect x="260" y="96" width="180" height="110" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2"/>
+  <g transform="translate(335,106) scale(0.625)"><use class="on-light" href="#ic-tools-l"></use><use class="on-dark" href="#ic-tools-d"></use></g>
+  <path d="M228 151 L254 151" stroke="var(--mine)" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+  <rect x="524" y="48" width="460" height="250" rx="12" fill="var(--mine-bg2)" stroke="var(--mine)" stroke-width="2.5"/>
+  <rect x="552" y="96" width="180" height="110" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2"/>
+  <g transform="translate(627,106) scale(0.625)"><use class="on-light" href="#ic-loop-l"></use><use class="on-dark" href="#ic-loop-d"></use></g>
+  <rect x="776" y="96" width="186" height="110" rx="9" fill="var(--card)" stroke="var(--mine)" stroke-width="2" stroke-dasharray="6 4"/>
+  <g transform="translate(854,106) scale(0.625)"><use class="on-light" href="#ic-srv-l"></use><use class="on-dark" href="#ic-srv-d"></use></g>
+  <path d="M736 138 L770 138" stroke="var(--mine)" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+  <path d="M770 170 L742 170" stroke="var(--mine)" stroke-width="2" fill="none" marker-end="url(#a3)"/>
+
+  <rect x="16" y="326" width="968" height="130" rx="10" fill="var(--theirs-bg)" stroke="var(--theirs)" stroke-width="2"/>
+  <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--mine)"/></marker></defs>
+
+        <text class="t-lane" x="20" y="34" fill="var(--muted)">いま（MCPなし）</text>
+        <text class="t-lane" x="530" y="34" fill="var(--mine)">MCP 版</text>
+        <text class="t-sub" x="32" y="76" fill="var(--muted)">1プロセス</text>
+        <text class="t-title" x="134" y="158" text-anchor="middle" fill="var(--fg)">agent.py</text>
+        <text class="t-sub" x="134" y="178" text-anchor="middle" fill="var(--muted)">ループ＋ガード</text>
+        <text class="t-title" x="350" y="158" text-anchor="middle" fill="var(--fg)">tools.py</text>
+        <text class="t-sub" x="350" y="178" text-anchor="middle" fill="var(--muted)">DEFS ＋ IMPL</text>
+        <text class="t-note" x="36" y="248" fill="var(--muted)">import で繋がっている。関数呼び出し1回。</text>
+        <text class="t-note" x="36" y="272" fill="var(--muted)">設定ファイルなし。起動は python agent.py だけ。</text>
+        <text class="t-sub" x="540" y="76" fill="var(--muted)">2プロセス</text>
+        <text class="t-title" x="642" y="158" text-anchor="middle" fill="var(--fg)">agent.py</text>
+        <text class="t-sub" x="642" y="178" text-anchor="middle" fill="var(--muted)">＋ MCP クライアント</text>
+        <text class="t-title" x="869" y="158" text-anchor="middle" fill="var(--fg)">MCP サーバー</text>
+        <text class="t-sub" x="869" y="178" text-anchor="middle" fill="var(--muted)">DEFS ＋ IMPL</text>
+        <text class="t-arrow" x="753" y="124" text-anchor="middle" fill="var(--mine)">JSON-RPC</text>
+        <text class="t-arrow" x="753" y="196" text-anchor="middle" fill="var(--mine)">stdio</text>
+        <text class="t-note" x="544" y="248" fill="var(--fg)">プロセス境界が1本増える。ツール一覧は起動時に問い合わせる。</text>
+        <text class="t-note" x="544" y="272" fill="var(--mine)">.mcp.json で「どのサーバーをどう起動するか」を設定する。</text>
+        <text class="t-title" x="36" y="356" fill="var(--theirs)">変わらないもの（＝この lab で学んだことは全部そのまま効く）</text>
+        <text class="t-note" x="36" y="382" fill="var(--fg)">・stop_reason を見て回すループ　　・tool_use / tool_result の往復と tool_use_id　　・messages が毎周伸びること</text>
+        <text class="t-note" x="36" y="404" fill="var(--fg)">・description がツール選択を決めること　　・Claude が受け取るのは説明書だけで、実体には触れないこと</text>
+        <text class="t-note" x="36" y="432" fill="var(--theirs)">★ 論点が1つ増える：ガードをクライアント側に置くか、MCP サーバー側に置くか（サーバー側なら他の利用者にも効く）</text>
+      </svg>
+<figcaption>MCP は<b>ツールの置き場所を変える規格</b>であって、エージェントの動き方を変えるものではない。だから土台（このlab）を先に作った。</figcaption>
+</figure>
+
+<h2><span class="n">4</span>コード上で具体的に何が変わるか</h2>
+<div class="tbl-scroll">
+<table>
+<tr><th>観点</th><th>MCPなし版（いま）</th><th>MCP 版</th><th>ドメイン</th></tr>
+<tr><td>ツールの定義場所</td><td><code>tools.py</code> の <code>DEFS</code> をハードコード</td><td><b>サーバーに問い合わせて取得</b>（<code>tools/list</code>）</td><td>2（18%）</td></tr>
+<tr><td>ツールの実行</td><td><code>IMPL[name](**input)</code> ＝ 関数呼び出し</td><td><b><code>tools/call</code> を JSON-RPC で送る</b></td><td>2（18%）</td></tr>
+<tr><td>エラーの返し方</td><td><code>{"error": ...}</code> を自分で詰める</td><td><b><code>isError</code> フラグ</b>（MCP の仕様）</td><td>2（18%）</td></tr>
+<tr><td>設定</td><td>なし</td><td><b><code>.mcp.json</code></b>（プロジェクト/ユーザースコープ、<b>環境変数展開</b>）</td><td>3（20%）</td></tr>
+<tr><td>起動</td><td><code>python agent.py</code></td><td>サーバーを子プロセスとして起動（stdio）</td><td>—</td></tr>
+<tr><td>再利用</td><td>この <code>agent.py</code> 専用</td><td><b>Claude Code からも使える</b>・複数サーバー同時利用</td><td>2・3</td></tr>
+<tr><td><b>ガードの置き場所</b></td><td>クライアント（<code>agent.py</code>）の <code>if</code></td><td><b>クライアント側 or サーバー側の選択が発生</b></td><td>1・2・5</td></tr>
+<tr><td>リソース（読み取り専用データ）</td><td>概念なし</td><td><b>Resources</b>（カタログ的データ）と <b>Tools</b>（行為）を使い分ける</td><td>2（18%）</td></tr>
+</table>
+</div>
+<p><b>範囲の注意：</b>MCP の<b>設定</b>（スコープ・環境変数展開・複数サーバー同時利用）と<b>設計</b>（Resources と Tools の使い分け・description の質・構造化エラー）は In-Scope。一方 <b>MCP サーバーのデプロイ・ホスティング（インフラ、ネットワーク、コンテナ）は §17 で明示的に範囲外</b>。自作して繋ぐところまでがやる範囲。</p>
+
+<footer>
+<p><b>出典</b></p>
+<ul>
+<li><code>CCAR-F-exam-guide-official.pdf</code> — §5 シナリオ1（原文：<i>customer support resolution agent using the Claude Agent SDK ... custom MCP tools (get_customer, lookup_order, process_refund, escalate_to_human) ... 80%+ first-contact resolution while knowing when to escalate</i>）／§9 Question 1／§17 In-Scope・Out-of-Scope（p.37-39）</li>
+<li><code>labs/scenario1-no-mcp/</code> — 図の内容はこの実装そのもの（<code>tools.py</code> の <code>DEFS</code>/<code>IMPL</code>、<code>agent.py</code> の <code>for turn in range(MAX_TURNS)</code> と実行前ガード）</li>
+<li><code>guide_ja.pdf</code> 第4章（MCP：サーバー・設定・<code>isError</code>・リソース）</li>
+<li>アイコン：AWS Architecture Icons <code>Icon-package_07312026.zip</code> の <code>Res_General-Icons</code>（汎用のみ）</li>
+</ul>
+</footer>
+</div>

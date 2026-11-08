@@ -1,0 +1,4 @@
+# whiteboard-anime-harness チャンネル定義 (このファイルがチャンネル dir のマーカー)
+name: video
+# 台本 YAML が単体で完結するのが契約 — 声・fps は episodes/*.yaml 側に書く。
+# ここにはチャンネル運用のメモだけを置く (エンジンはこのファイルの中身を読まない)

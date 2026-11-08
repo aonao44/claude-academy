@@ -1,0 +1,26 @@
+# ep-starter — 画像アセットなしで一発レンダリングできる開通確認用の台本。
+# 実制作では docs/CONTEXT.md (エンジン側の正本) と scripts/agent-intro-24.yaml (正例) を読んでから書く。
+# 声は TTS backend の声名。既定 backend = ローカル AivisSpeech (まお は同梱モデル — 動画で使うなら ACML クレジット)。
+# 一覧: curl "${WB_AIVIS_URL:-http://127.0.0.1:10101}/speakers" (openai 互換なら curl "$WB_TTS_BASE/v1/voices")
+title: "開通確認"
+voice: まお
+fps: 24
+scenes:
+  - id: hello
+    beats:
+      - say: "チャンネルの開通を確認します。ペンで描きながら、話す準備ができました。"
+        draw:
+          - { kind: text, size: 60, text: "開通確認", align: center }
+          - { kind: underline, color: red, sw: 5, rough: 2.4 }
+          - { kind: gap, h: 60 }
+          - kind: row
+            items:
+              - { kind: rect, w: 380, h: 150, label: "台本" }
+              - { kind: arrow }
+              - { kind: rect, w: 380, h: 150, label: "音声" }
+              - { kind: arrow }
+              - { kind: rect, w: 380, h: 150, label: "動画" }
+      - say: "この 3 つが繋がれば、セットアップは完了です。"
+        draw:
+          - { kind: gap, h: 40 }
+          - { kind: text, size: 36, text: "セットアップ完了", color: blue, align: center }

@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "claude_academy",
+  "project_id": "efccd590-e12f-41fe-af50-f86c986f7630"
+}
